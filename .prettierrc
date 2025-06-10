@@ -1,0 +1,13 @@
+{
+	"tabWidth": 2,
+	"semi": true,
+	"experimentalTernaries": true,
+	"printWidth": 100,
+	"useTabs": true,
+	"singleQuote": true,
+	"trailingComma": "es5",
+	"bracketSpacing": true,
+	"objectWrap": "collapse",
+	"arrowParens": "always",
+	"endOfLine": "crlf"
+}
