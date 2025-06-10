@@ -2,7 +2,7 @@
 	"tabWidth": 2,
 	"semi": true,
 	"experimentalTernaries": true,
-	"printWidth": 100,
+	"printWidth": 120,
 	"useTabs": true,
 	"singleQuote": true,
 	"trailingComma": "es5",

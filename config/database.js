@@ -9,16 +9,4 @@ const pool = mysql
 	})
 	.promise();
 
-// function to check database connection is success or not
-const checkConnection = async () => {
-	try {
-		const connection = await pool.getConnection();
-		console.log('Database Connection Successful!!');
-		connection.release();
-	} catch (error) {
-		console.log('Error connecting to database!');
-		throw error;
-	}
-};
-
-module.exports = { pool, checkConnection };
+module.exports = { pool };
