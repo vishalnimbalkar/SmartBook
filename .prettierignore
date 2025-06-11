@@ -1,6 +1,8 @@
 # Ignore dependencies
 node_modules/
 
+/utilities
+
 # Ignore specific files
 .env
 package-lock.json

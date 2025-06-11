@@ -15,9 +15,9 @@ const transporter = nodemailer.createTransport({
  * @param {string} verificationToken - token for email verification
  * @returns
  */
-const sendEmail = async (to, name, verificationToken) => {
+const sendVerificationEmail = async (to, name, verificationToken) => {
 	//verification api with jwt token
-	const verificationUrl = `http://localhost:3000/user/verify?verification_token=${verificationToken}`;
+	const verificationUrl = `http://localhost:3000/user/verify?verificationToken=${verificationToken}`;
 	const ejsTemplate = await ejs.renderFile('./utilities/templates/email.ejs', { name, verificationUrl });
 	const mailOptions = {
 		from: process.env.EMAIL_USER,
@@ -26,16 +26,38 @@ const sendEmail = async (to, name, verificationToken) => {
 		html: ejsTemplate,
 
 		// Attachments for email
-		// attachments: [
-		//     {
-		//         filename: 'logo.png',
-		//         path: './images/logo.png',
-		//         cid: 'logo',
-		//         contentDisposition: 'inline',
-		//     }
-		// ],
+		attachments: [
+			{
+				filename: 'logo.png',
+				path: './utilities/images/logo.png',
+				cid: 'logo',
+				contentDisposition: 'inline',
+			}
+		],
 	};
 	return transporter.sendMail(mailOptions);
 };
 
-module.exports = { sendEmail };
+const forgotPasswordEmail = async (verificationToken, to, name) => {
+	//verification api with jwt token
+	const resetUrl = `http://localhost:3000/user/reset-password?verificationToken=${verificationToken}`;
+	const ejsTemplate = await ejs.renderFile('./utilities/templates/forgotPassword.ejs', { name, resetUrl });
+	const mailOptions = {
+		from: process.env.EMAIL_USER,
+		to,
+		subject: 'Reset Password',
+		html: ejsTemplate,
+
+		// Attachments for email
+		attachments: [
+			{
+				filename: 'logo.png',
+				path: './utilities/images/logo.png',
+				cid: 'logo',
+				contentDisposition: 'inline',
+			}
+		],
+	};
+	return transporter.sendMail(mailOptions);
+}
+module.exports = { sendVerificationEmail, forgotPasswordEmail };

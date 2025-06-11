@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>Verification Status</title>
+	<style>
+		body {
+			margin: 0;
+			padding: 0;
+			font-family: Arial, sans-serif;
+			background-color: #f0f4f8;
+			color: #333;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			min-height: 100vh;
+		}
+		.container {
+			background-color: #ffffff;
+			padding: 40px 30px;
+			border-radius: 10px;
+			box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+			max-width: 500px;
+			text-align: center;
+		}
+		.logo {
+			max-height: 100px;
+			margin-bottom: 10px;
+		}
+		h1 {
+			margin-bottom: 10px;
+		}
+		p {
+			font-size: 16px;
+			line-height: 1.6;
+		}
+		.button {
+			margin-top: 25px;
+		}
+		a.login-btn {
+			background-color: #2b4f81;
+			color: #fff;
+			text-decoration: none;
+			padding: 12px 24px;
+			font-size: 16px;
+			border-radius: 5px;
+			display: inline-block;
+			transition: background-color 0.3s ease;
+		}
+		a.login-btn:hover {
+			background-color: #1f3b61;
+		}
+		.error {
+			color: #b91c1c;
+		}
+		a.retry-link {
+			display: inline-block;
+			margin-top: 15px;
+			color: #b91c1c;
+			text-decoration: underline;
+			font-size: 14px;
+		}
+		footer {
+			margin-top: 30px;
+			font-size: 12px;
+			color: #777;
+		}
+	</style>
+</head>
+<body>
+	<% if (success === true) { %>
+		<div class="container">
+			<img src="/images/logo.png" alt="SmartBook Logo" class="logo" />
+			<h1 style="color: #2b4f81;">🎉 Account Verified Successfully!</h1>
+			<p>Hi <strong><%= name %></strong>,</p>
+			<p>
+				Your email has been successfully verified. You're now ready to start using <strong>SmartBook</strong> to discover, read, and manage your favorite books.
+			</p>
+			<p>Explore your dashboard and start building your personal library today!</p>
+			<div class="button">
+				<a href="<%= loginUrl %>" class="login-btn" target="_blank">Go to Login</a>
+			</div>
+			<footer>
+				<p>&copy; 2025 SmartBook. All rights reserved.</p>
+			</footer>
+		</div>
+	<% } else { %>
+		<div class="container">
+			<img src="/images/logo.png" alt="SmartBook Logo" class="logo" />
+			<h1 class="error">❌ Verification Failed</h1>
+			<p class="error"><%= message || "Invalid or expired verification link." %></p>
+			<p>Please check the link again or request a new verification email.</p>
+			<div class="button">
+				<a href="<%= loginUrl %>" class="login-btn" target="_blank">Back to Login</a>
+			</div>
+			<footer>
+				<p>&copy; 2025 SmartBook. All rights reserved.</p>
+			</footer>
+		</div>
+	<% } %>
+</body>
+</html>
