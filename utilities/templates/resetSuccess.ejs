@@ -25,8 +25,7 @@
 			text-align: center;
 		}
 		.logo {
-			max-height: 100px;
-			margin-bottom: 10px;
+			max-height: 120px;
 		}
 		h1 {
 			margin-bottom: 10px;
@@ -72,7 +71,7 @@
 	<% if (success === true) { %>
 		<div class="container">
 			<img src="/images/logo.png" alt="SmartBook Logo" class="logo" />
-			<h1 style="color: #2b4f81;">🔒 Password Reset Successfully!</h1>
+			<h1 style="color: #2b4f81;">Password Reset Successfully!</h1>
 			<p>Your password has been updated. You can now log in with your new credentials.</p>
 			<div class="button">
 				<a href="<%= loginUrl %>" class="login-btn" target="_blank">Go to Login</a>
@@ -84,9 +83,12 @@
 	<% } else { %>
 		<div class="container">
 			<img src="/images/logo.png" alt="SmartBook Logo" class="logo" />
-			<h1 class="error">❌ Password Reset Failed</h1>
+			<h1 class="error">Password Reset Failed</h1>
 			<p class="error">Something went wrong while resetting your password.</p>
 			<p>Please try again or request a new password reset link.</p>
+			<div class="button">
+				<a href="<%= loginUrl %>" class="login-btn" target="_blank">Go to Login</a>
+			</div>
 			<footer>
 				<p>&copy; 2025 SmartBook. All rights reserved.</p>
 			</footer>

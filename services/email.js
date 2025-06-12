@@ -27,12 +27,7 @@ const sendVerificationEmail = async (to, name, verificationToken) => {
 
 		// Attachments for email
 		attachments: [
-			{
-				filename: 'logo.png',
-				path: './utilities/images/logo.png',
-				cid: 'logo',
-				contentDisposition: 'inline',
-			}
+			{ filename: 'logo.png', path: './utilities/images/logo.png', cid: 'logo', contentDisposition: 'inline' },
 		],
 	};
 	return transporter.sendMail(mailOptions);
@@ -50,14 +45,9 @@ const forgotPasswordEmail = async (verificationToken, to, name) => {
 
 		// Attachments for email
 		attachments: [
-			{
-				filename: 'logo.png',
-				path: './utilities/images/logo.png',
-				cid: 'logo',
-				contentDisposition: 'inline',
-			}
+			{ filename: 'logo.png', path: './utilities/images/logo.png', cid: 'logo', contentDisposition: 'inline' },
 		],
 	};
 	return transporter.sendMail(mailOptions);
-}
+};
 module.exports = { sendVerificationEmail, forgotPasswordEmail };

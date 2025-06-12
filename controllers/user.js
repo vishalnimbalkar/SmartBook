@@ -1,9 +1,10 @@
 const bcrypt = require('bcryptjs');
 const { pool } = require('../config/database');
-const { generateToken, emailVerificationToken, forgotPasswordToken } = require('../middlewares/jwt.js');
+const { generateToken, emailVerificationToken } = require('../middlewares/jwt.js');
 const jwt = require('jsonwebtoken');
 const { sendVerificationEmail, forgotPasswordEmail } = require('../services/email.js');
 
+// function register new user and send success
 const registerCustomer = async (req, res) => {
 	const connection = await pool.getConnection();
 	try {
@@ -44,9 +45,7 @@ const registerCustomer = async (req, res) => {
 	}
 };
 
-/**
- * function to verify user email 
- */
+// function to verify user email
 const verifyUser = async (req, res) => {
 	const verificationToken = req.query.verificationToken;
 	// Virify jwt token and extract user email
@@ -59,7 +58,7 @@ const verifyUser = async (req, res) => {
 			return res.render('verifySuccess', {
 				success: false,
 				message: 'Invalid or expired verification link.',
-				loginUrl: 'http://localhost:4200/login',
+				loginUrl: `${process.env.CLIENT_URL}/login`,
 			});
 		}
 		//Check user is already verified or not
@@ -68,29 +67,24 @@ const verifyUser = async (req, res) => {
 				success: true,
 				name: user.name,
 				message: 'Your email has already been verified.',
-				loginUrl: 'http://localhost:4200/login',
+				loginUrl: `${process.env.CLIENT_URL}/login`,
 			});
 		}
 		// Set verification token null and mark user as verified
-		await pool.query(
-			`update mst_users set isVerified = 1, verificationToken = null where email = ?`,
-			[email]
-		);
+		await pool.query(`update mst_users set isVerified = 1, verificationToken = null where email = ?`, [email]);
 		// return res.status(200).json({ success: true, message: 'User verified successfully.' });
-		return res.render('verifySuccess', { success: true, name: user.name, loginUrl: 'localhot:4200/login' });
-
+		return res.render('verifySuccess', { success: true, name: user.name, loginUrl: `${process.env.CLIENT_URL}/login` });
 	} catch (error) {
 		console.log(error);
 		return res.render('verifySuccess', {
 			success: false,
 			message: 'Something went wrong during verification. Please try again later.',
-			loginUrl: 'http://localhost:4200/login',
+			loginUrl: `${process.env.CLIENT_URL}/login`,
 		});
 	}
 };
-/**
- * function to login into account for customer and admin
- */
+
+// function to login into account for customer and admin
 const login = async (req, res) => {
 	try {
 		const { email, password } = req.body;
@@ -127,13 +121,15 @@ const login = async (req, res) => {
 	}
 };
 
-/**
- * function get user details by id
- */
+// function get user details by id
 const getUserDetailsById = async (req, res) => {
 	try {
 		//get user id from request params
-		const userId = req.params.id;
+		const userId = Number(req.params.id);
+		//check id is valid or not
+		if (isNaN(userId)) {
+			return res.status(400).json({ success: false, message: 'Invalid User ID' });
+		}
 		const query = `select id, email, name, password, phone, isActive, isVerified, createdAt, updatedAt from mst_users where id = ? limit 1`;
 		const [row] = await pool.query(query, [userId]);
 		//check user find or not if not return 404
@@ -147,12 +143,14 @@ const getUserDetailsById = async (req, res) => {
 	}
 };
 
-/**
- * function update user details partially
- */
+// function update user details partially
 const updateProfile = async (req, res) => {
 	try {
 		const userId = Number(req.params.id);
+		//check id is valid or not
+		if (isNaN(userId)) {
+			return res.status(400).json({ success: false, message: 'Invalid User ID' });
+		}
 		const { name, email, phone } = req.body;
 		// Map of fields to be updated
 		const fields = { name, email, phone };
@@ -188,12 +186,14 @@ const updateProfile = async (req, res) => {
 	}
 };
 
-/**
- * function delete user by id
- */
+// function delete user by id
 const deleteUser = async (req, res) => {
 	try {
 		const userId = Number(req.params.id);
+		//check id is valid or not
+		if (isNaN(userId)) {
+			return res.status(400).json({ success: false, message: 'Invalid User ID' });
+		}
 		const query = `delete from mst_users where id = ?`;
 		const [result] = await pool.query(query, [userId]);
 		//checks user exists or not
@@ -207,48 +207,69 @@ const deleteUser = async (req, res) => {
 	}
 };
 
+// function sends email to user with reset password link
 const forgotPassword = async (req, res) => {
 	try {
 		const { email } = req.body;
 		const query = `select id, email, name, password, phone, isActive, isVerified, createdAt, updatedAt from mst_users where email = ? LIMIT 1`;
 		const [row] = await pool.query(query, [email]);
-		//checks user exists or not 
+		//checks user exists or not
 		if (row.length === 0) {
-			return res.status(400).json({ success: false, message: 'If the email is registered, a reset link will be sent.' });
+			return res
+				.status(400)
+				.json({ success: false, message: 'If the email is registered, a reset link will be sent.' });
 		}
 		const user = row[0];
+		//generate token with 15 min expire time
 		const token = jwt.sign({ email }, process.env.JWT_FORGOT_PASSWORD_KEY, { expiresIn: '15m' });
+		//sending forgot password email
 		await forgotPasswordEmail(token, email, user.name);
 		return res.status(200).json({ success: true, message: 'If the email is registered, a reset link will be sent.' });
 	} catch (error) {
 		console.log(error);
 		return res.status(500).json({ success: false, message: 'Server side error', error: error.message });
 	}
-}
+};
 
+// function renders reset password form after clicking on reset password button from email
 const resetPasswordForm = async (req, res) => {
 	try {
 		const { verificationToken } = req.query;
+		//verify token
 		jwt.verify(verificationToken, process.env.JWT_FORGOT_PASSWORD_KEY);
+		// render reset password form after token verification
 		res.render('resetPassword', { success: true, verificationToken });
-	} catch {
-		res.render('resetPassword', { success: false });
+	} catch (error) {
+		console.log(error);
+		res.render('resetPassword', { success: false, loginUrl: `${process.env.CLIENT_URL}/login` });
 	}
 };
 
+// function reset password and render reset success template
 const resetPassword = async (req, res) => {
 	try {
 		const { verificationToken } = req.query;
 		const { password } = req.body;
+		//verify token and extract email
 		const { email } = jwt.verify(verificationToken, process.env.JWT_FORGOT_PASSWORD_KEY);
+		// hashed password before storing into database
 		const hashedPassword = await bcrypt.hash(password, 10);
-
 		await pool.query('update mst_users set password = ? where email = ?', [hashedPassword, email]);
-		res.render('resetSuccess', { success: true, loginUrl: `localhost:4200/login` });
+		res.render('resetSuccess', { success: true, loginUrl: `${process.env.CLIENT_URL}/login` });
 	} catch (error) {
 		console.log(error);
-		res.render('resetSuccess', { success: false });
+		res.render('resetSuccess', { success: false, loginUrl: `${process.env.CLIENT_URL}/login` });
 	}
 };
 
-module.exports = { registerCustomer, login, getUserDetailsById, verifyUser, updateProfile, deleteUser, forgotPassword, resetPasswordForm, resetPassword };
+module.exports = {
+	registerCustomer,
+	login,
+	getUserDetailsById,
+	verifyUser,
+	updateProfile,
+	deleteUser,
+	forgotPassword,
+	resetPasswordForm,
+	resetPassword,
+};

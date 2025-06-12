@@ -10,14 +10,14 @@ export default defineConfig([
 	{
 		rules: {
 			'no-undef': 'off',
-			'semi': 'warn',
+			semi: 'warn',
 			'no-unused-vars': 'warn',
-			'quotes': ['warn', 'single', { allowTemplateLiterals: true }],
+			quotes: ['warn', 'single', { allowTemplateLiterals: true }],
 			'arrow-body-style': ['warn', 'always'],
-			'eqeqeq': 'warn',
+			eqeqeq: 'warn',
 			'no-var': 'warn',
 			'prefer-const': 'warn',
-			'camelcase': [
+			camelcase: [
 				'warn',
 				{ properties: 'always', ignoreDestructuring: false, ignoreImports: false, ignoreGlobals: false },
 			],
