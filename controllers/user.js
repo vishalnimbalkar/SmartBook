@@ -16,7 +16,7 @@ const registerCustomer = async (req, res) => {
 		const [result] = await pool.query(emailQuery, [email]);
 		//if result contains user return email already exists
 		if (result.length === 1) {
-			return res.status(400).json({ success: false, message: 'Email Already Exists' });
+			return res.status(400).json({ success: false, message: 'Email Already Exists. Please try another Email or User' });
 		}
 
 		// Hash the password using bcryptjs
@@ -36,12 +36,12 @@ const registerCustomer = async (req, res) => {
 		// If everything succeeds, commit transaction
 		await connection.commit();
 		connection.release();
-		return res.status(200).json({ success: true, message: 'Customer Registed Successfully' });
+		return res.status(201).json({ success: true, message: 'Customer Registered Successfully. Please verify your email.' });
 	} catch (error) {
 		await connection.rollback();
 		connection.release();
 		console.log(error);
-		return res.status(500).json({ success: false, message: 'Server side error', error: error.message });
+		return res.status(500).json({ success: false, message: error.message });
 	}
 };
 
@@ -57,16 +57,7 @@ const verifyUser = async (req, res) => {
 		if (!user) {
 			return res.render('verifySuccess', {
 				success: false,
-				message: 'Invalid or expired verification link.',
-				loginUrl: `${process.env.CLIENT_URL}/login`,
-			});
-		}
-		//Check user is already verified or not
-		if (user.isVerified) {
-			return res.render('verifySuccess', {
-				success: true,
-				name: user.name,
-				message: 'Your email has already been verified.',
+				message: 'Email is already Verified',
 				loginUrl: `${process.env.CLIENT_URL}/login`,
 			});
 		}
@@ -89,7 +80,7 @@ const login = async (req, res) => {
 	try {
 		const { email, password } = req.body;
 		//Get user by email
-		const query = `select id, email, name, password, phone, isActive, isVerified, createdAt, updatedAt from mst_users where email = ? LIMIT 1`;
+		const query = `select id, email, name, password, role, phone, isActive, isVerified, createdAt, updatedAt from mst_users where email = ? LIMIT 1`;
 		const [rows] = await pool.query(query, email);
 		//Check if user data is fetched or not
 		if (rows.length === 0) {
@@ -102,7 +93,7 @@ const login = async (req, res) => {
 			return res.status(403).json({ success: false, message: 'Your account is deactivated' });
 		}
 		if (!user.isVerified) {
-			return res.status(403).json({ success: false, message: 'Email is not Verified' });
+			return res.status(403).json({ success: false, message: 'Email is not Verified. Please verify email' });
 		}
 		//password verification
 		const isMatch = await bcrypt.compare(password, user.password);
@@ -117,7 +108,7 @@ const login = async (req, res) => {
 		return res.status(200).json({ success: true, message: 'Login successfully', user, accessToken });
 	} catch (error) {
 		console.log(error);
-		return res.status(500).json({ success: false, message: 'Server side error', error: error.message });
+		return res.status(500).json({ success: false, message: error.message });
 	}
 };
 
@@ -139,7 +130,7 @@ const getUserDetailsById = async (req, res) => {
 		return res.status(200).json({ success: true, message: 'Successfully get User details', user: row[0] });
 	} catch (error) {
 		console.log(error);
-		return res.status(500).json({ success: false, message: 'Server side error', error: error.message });
+		return res.status(500).json({ success: false, message: error.message });
 	}
 };
 
@@ -167,7 +158,7 @@ const updateProfile = async (req, res) => {
 
 		// If no valid fields to update
 		if (fieldsToUpdates.length === 0) {
-			return res.status(400).json({ success: false, message: 'No valid fields provided for update.' });
+			return res.status(400).json({ success: false, message: 'Please provide valid fields for update.' });
 		}
 		// Push user id at the end of the values
 		values.push(userId);
@@ -182,7 +173,7 @@ const updateProfile = async (req, res) => {
 		return res.status(200).json({ success: true, message: 'User details updated successfully' });
 	} catch (error) {
 		console.log(error);
-		return res.status(500).json({ success: false, message: 'Server side error', error: error.message });
+		return res.status(500).json({ success: false, message: error.message });
 	}
 };
 
@@ -203,7 +194,7 @@ const deleteUser = async (req, res) => {
 		return res.status(200).json({ success: true, message: 'User details deleted successfully' });
 	} catch (error) {
 		console.log(error);
-		return res.status(500).json({ success: false, message: 'Server side error', error: error.message });
+		return res.status(500).json({ success: false, message: error.message });
 	}
 };
 
@@ -227,7 +218,7 @@ const forgotPassword = async (req, res) => {
 		return res.status(200).json({ success: true, message: 'If the email is registered, a reset link will be sent.' });
 	} catch (error) {
 		console.log(error);
-		return res.status(500).json({ success: false, message: 'Server side error', error: error.message });
+		return res.status(500).json({ success: false, message: error.message });
 	}
 };
 
@@ -262,6 +253,133 @@ const resetPassword = async (req, res) => {
 	}
 };
 
+//fuction get all customers list
+const getAllCustomers = async (req, res) => {
+	try {
+		// Allow only admin
+		if (req.user.role !== 'admin') {
+			return res.status(403).json({ success: false, message: 'Access denied. Admins only.' });
+		}
+		const page = Number(req.query.page) || 1;
+		const limit = Number(req.query.limit) || 10;
+		//calculate offset by using page and limit
+		const offset = (page - 1) * limit;
+
+		const { name, email, isActive, isVerified } = req.query;
+		let { sortBy, orderBy } = req.query;
+
+		// validate sorting columns and orderby 
+		const allowedSortBy = ['name', 'email', 'createdAt'];
+		sortBy = allowedSortBy.includes(sortBy) ? sortBy : 'createdAt';
+		orderBy = orderBy === 'desc' ? 'desc' : 'asc';
+
+		// filters 
+		const filters = [`role = 'customer'`];
+		const values = [];
+
+		if (name) {
+			filters.push(`name LIKE ?`);
+			values.push(`%${name}%`);
+		}
+		if (email) {
+			filters.push(`email LIKE ?`);
+			values.push(`%${email}%`);
+		}
+		if (isActive !== undefined) {
+			filters.push(`isActive = ?`);
+			values.push(isActive === 'true');
+		}
+		if (isVerified !== undefined) {
+			filters.push(`isVerified = ?`);
+			values.push(isVerified === 'true');
+		}
+		const whereClause = `where ${filters.join(' and ')}`;
+
+		// Page Count
+		const [countRows] = await pool.query(`select count(*) as count from mst_users ${whereClause}`, values);
+		const totalUsers = countRows[0].count;
+		const totalPages = Math.ceil(totalUsers / limit);
+
+		// customers data
+		const [rows] = await pool.query(
+			`select id, name, email, phone, isActive, isVerified, createdAt, updatedAt 
+			 from mst_users 
+			 ${whereClause}
+			 order by ${sortBy} ${orderBy}
+			 limit ? offset ?`,
+			[...values, limit, offset]
+		);
+
+		res.status(200).json({
+			success: true,
+			message: 'Customers data fetched successfully',
+			currentPage: page,
+			totalPages,
+			totalUsers,
+			users: rows
+		});
+	} catch (error) {
+		console.error(error);
+		res.status(500).json({ success: false, message: error.message });
+	}
+};
+
+const deactivateCustomer = async (req, res) => {
+	try {
+		// Allow only admin
+		if (req.user.role !== 'admin') {
+			return res.status(403).json({ success: false, message: 'Access denied. Admins only.' });
+		}
+		const userId = Number(req.params.userId);
+		//check id is valid or not
+		if (isNaN(userId)) {
+			return res.status(400).json({ success: false, message: 'Invalid User ID' });
+		}
+		//check user exists or not
+		const idQuery = `select id, email, name, phone, isActive, isVerified, createdAt, updatedAt from mst_users where id = ? LIMIT 1`;
+		const [result] = await pool.query(idQuery, [userId]);
+		const user = result[0];
+		if (!user) {
+			return res.status(404).json({ success: false, message: 'User not found' });
+		}
+		// update operation
+		const query = `update mst_users set isActive = 0 where id = ?`;
+		await pool.query(query, [userId]);
+		return res.status(200).json({ success: true, message: 'User deactivated successfully' });
+	} catch (error) {
+		console.error(error);
+		res.status(500).json({ success: false, message: error.message });
+	}
+};
+
+const activateCustomer = async (req, res) => {
+	try {
+		// Allow only admin
+		if (req.user.role !== 'admin') {
+			return res.status(403).json({ success: false, message: 'Access denied. Admins only.' });
+		}
+		const userId = Number(req.params.userId);
+		//check id is valid or not
+		if (isNaN(userId)) {
+			return res.status(400).json({ success: false, message: 'Invalid User ID' });
+		}
+		//check user exists or not
+		const idQuery = `select id, email, name, phone, isActive, isVerified, createdAt, updatedAt from mst_users where id = ? LIMIT 1`;
+		const [result] = await pool.query(idQuery, [userId]);
+		const user = result[0];
+		if (!user) {
+			return res.status(404).json({ success: false, message: 'User not found' });
+		}
+		// update operation
+		const query = `update mst_users set isActive = 1 where id = ?`;
+		await pool.query(query, [userId]);
+		return res.status(200).json({ success: true, message: 'User activated successfully' });
+	} catch (error) {
+		console.error(error);
+		res.status(500).json({ success: false, message: error.message });
+	}
+};
+
 module.exports = {
 	registerCustomer,
 	login,
@@ -272,4 +390,7 @@ module.exports = {
 	forgotPassword,
 	resetPasswordForm,
 	resetPassword,
+	getAllCustomers,
+	deactivateCustomer,
+	activateCustomer
 };
