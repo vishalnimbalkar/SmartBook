@@ -18,25 +18,27 @@
 		}
 		.container {
 			background-color: #ffffff;
-			padding: 40px 30px;
-			border-radius: 10px;
+			border-radius: 8px;
 			box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
-			max-width: 500px;
+			max-width: 448px;
 			text-align: center;
 		}
+		.header {
+			background-color: #bbcae4;
+			text-align: center;
+			border-radius: 10px 10px 0 0;
+		}
+
+		h2{
+			color: #2b4f81;
+			margin-bottom: 5px;
+		}
+
 		.logo {
-			max-height: 120px;
+			max-height: 110px;
 		}
-		h1 {
-			margin-bottom: 10px;
-		}
-		p {
-			font-size: 16px;
-			line-height: 1.6;
-		}
-		.button {
-			margin-top: 25px;
-		}
+
+		
 		a.login-btn {
 			background-color: #2b4f81;
 			color: #fff;
@@ -46,57 +48,58 @@
 			border-radius: 5px;
 			display: inline-block;
 			transition: background-color 0.3s ease;
+			margin-bottom: 15px;
+			margin-top: 10px;
 		}
 		a.login-btn:hover {
 			background-color: #1f3b61;
 		}
-		.error {
-			color: #b91c1c;
+
+		p{
+			margin: 0;
+			padding: 0px 15px;
 		}
-		a.retry-link {
-			display: inline-block;
-			margin-top: 15px;
-			color: #b91c1c;
-			text-decoration: underline;
-			font-size: 14px;
+		
+		.footer {
+			background: #bbcae4;
+			text-align: center;
+			color: #666;
+			border-radius: 0 0 10px 10px;
+			height: 110px;
+			display: flex;
+			align-items: center;
+			justify-content: center;
 		}
-		footer {
-			margin-top: 30px;
-			font-size: 12px;
-			color: #777;
+
+		.footer p {
+			margin: 0;
 		}
+		
 	</style>
 </head>
 <body>
+	<div class="container">
+		<div class="header">
+			<img src="/images/logo.png" alt="SmartBook Logo" class="logo" />
+		</div>
 	<% if (success === true) { %>
-		<div class="container">
-			<img src="/images/logo.png" alt="SmartBook Logo" class="logo" />
-			<h1 style="color: #2b4f81;">Account Verified Successfully!</h1>
-			<p>Hi <strong><%= name %></strong>,</p>
-			<p>
-				Your email has been successfully verified. You're now ready to start using <strong>SmartBook</strong> to discover, read, and manage your favorite books.
-			</p>
-			<p>Explore your dashboard and start building your personal library today!</p>
-			<div class="button">
-				<a href="<%= loginUrl %>" class="login-btn" target="_blank">Go to Login</a>
-			</div>
-			<footer>
-				<p>&copy; 2025 SmartBook. All rights reserved.</p>
-			</footer>
-		</div>
+		<h2>Account Verified Successfully!</h2>
+		<p>Hi <strong><%= name %></strong>,</p>
+		<p>
+			Your email has been successfully verified. You're now ready to start using <strong>SmartBook</strong> to discover, read, and manage your favorite books.
+		</p>
+		<p>Explore your dashboard and start building your personal library today!</p>
 	<% } else { %>
-		<div class="container">
-			<img src="/images/logo.png" alt="SmartBook Logo" class="logo" />
-			<h1 class="error">Verification Failed</h1>
-			<p class="error"><%= message %></p>
-			<p>Please check the link again or request a new verification email.</p>
-			<div class="button">
-				<a href="<%= loginUrl %>" class="login-btn" target="_blank">Back to Login</a>
-			</div>
-			<footer>
-				<p>&copy; 2025 SmartBook. All rights reserved.</p>
-			</footer>
-		</div>
+		<h2>Verification Not Required</h2>
+		<p ><%= message %></p>
+		<p>You can safely ignore this message or proceed to login.</p>
 	<% } %>
+		<div class="button">
+			<a href="<%= loginUrl %>" class="login-btn" target="_blank">Back to Login</a>
+		</div>
+		<div class="footer">
+			<p>Copyright © 2025 SmartBook, All rights reserved.</p>
+		</div>
+	</div>
 </body>
 </html>

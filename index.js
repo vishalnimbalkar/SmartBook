@@ -4,6 +4,7 @@ const express = require('express');
 const path = require('path');
 const userRoutes = require('./routes/user.js');
 const addressRoutes = require('./routes/address.js');
+const categoryRoutes = require('./routes/category.js');
 
 const port = process.env.PORT;
 const app = express();
@@ -16,6 +17,7 @@ app.use(express.json());
 
 app.use('/user', userRoutes);
 app.use('/address', addressRoutes);
+app.use('/category', categoryRoutes);
 
 const server = http.createServer(app);
 server.listen(port, () => {

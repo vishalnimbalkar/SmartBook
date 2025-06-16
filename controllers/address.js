@@ -13,7 +13,7 @@ const addAddress = async (req, res) => {
 		const query = `insert into user_addresses (userId, addressLine, city, state, zipCode, country) values (?,?,?,?,?,?)`;
 		const addressData = [userId, addressLine, city, state, zipCode, country];
 		await pool.query(query, addressData);
-		return res.status(200).json({ success: true, message: 'Address added successfully' });
+		return res.status(201).json({ success: true, message: 'Address added successfully' });
 	} catch (error) {
 		console.error(error);
 		return res.status(500).json({ success: false, message: error.message });
@@ -57,6 +57,7 @@ const updateAddress = async (req, res) => {
 		const idQuery = `select id, addressLine, city, state, zipCode, createdAt, updatedAt from user_addresses where id = ? LIMIT 1`;
 		const [result] = await pool.query(idQuery, [addressId]);
 		const address = result[0];
+		//if result is empty
 		if (!address) {
 			return res.status(404).json({ success: false, message: 'Address not found' });
 		}
@@ -99,7 +100,7 @@ const deleteAddress = async (req, res) => {
 		}
 		const query = 'delete from user_addresses where id = ?';
 		const [result] = await pool.query(query, [addressId]);
-		//check address is deleted or not
+		//check address is exists or not
 		if (result.affectedRows === 0) {
 			return res.status(404).json({ success: false, message: 'Address not found' });
 		}

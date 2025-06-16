@@ -12,7 +12,7 @@ const registerCustomer = async (req, res) => {
 		// Start transaction
 		await connection.beginTransaction();
 		//check email is exists or not
-		const emailQuery = `select id, email, name, phone, isActive, isVerified, createdAt, updatedAt from mst_users where email = ? LIMIT 1`;
+		const emailQuery = `select id, email, name, phone, isActive, isVerified, createdAt, updatedAt from mst_users where email = ? limit 1`;
 		const [result] = await pool.query(emailQuery, [email]);
 		//if result contains user return email already exists
 		if (result.length === 1) {
@@ -57,7 +57,7 @@ const verifyUser = async (req, res) => {
 		if (!user) {
 			return res.render('verifySuccess', {
 				success: false,
-				message: 'Email is already Verified',
+				message: 'Your email is already verified.',
 				loginUrl: `${process.env.CLIENT_URL}/login`,
 			});
 		}
@@ -256,10 +256,6 @@ const resetPassword = async (req, res) => {
 //fuction get all customers list
 const getAllCustomers = async (req, res) => {
 	try {
-		// Allow only admin
-		if (req.user.role !== 'admin') {
-			return res.status(403).json({ success: false, message: 'Access denied. Admins only.' });
-		}
 		const page = Number(req.query.page) || 1;
 		const limit = Number(req.query.limit) || 10;
 		//calculate offset by using page and limit
@@ -324,12 +320,9 @@ const getAllCustomers = async (req, res) => {
 	}
 };
 
+// function deactivate customer
 const deactivateCustomer = async (req, res) => {
 	try {
-		// Allow only admin
-		if (req.user.role !== 'admin') {
-			return res.status(403).json({ success: false, message: 'Access denied. Admins only.' });
-		}
 		const userId = Number(req.params.userId);
 		//check id is valid or not
 		if (isNaN(userId)) {
@@ -352,12 +345,9 @@ const deactivateCustomer = async (req, res) => {
 	}
 };
 
+//function activate customer
 const activateCustomer = async (req, res) => {
 	try {
-		// Allow only admin
-		if (req.user.role !== 'admin') {
-			return res.status(403).json({ success: false, message: 'Access denied. Admins only.' });
-		}
 		const userId = Number(req.params.userId);
 		//check id is valid or not
 		if (isNaN(userId)) {
