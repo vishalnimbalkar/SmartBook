@@ -12,7 +12,7 @@ const {
 	resetPassword,
 	getAllCustomers,
 	deactivateCustomer,
-	activateCustomer
+	activateCustomer,
 } = require('../controllers/user');
 const { requireRole } = require('../middlewares/user.js');
 const router = express.Router();
@@ -25,7 +25,7 @@ router.post('/forgot-password', forgotPassword);
 router.get('/reset-password', resetPasswordForm); // render EJS form
 router.post('/reset-password', resetPassword); // handle reset password
 
-// Customer management by admin 
+// Customer management by admin
 router.get('/get-all-customers', jwtAuthMiddleware, requireRole('admin'), getAllCustomers);
 router.patch('/deactivate-customer/:userId', jwtAuthMiddleware, requireRole('admin'), deactivateCustomer);
 router.patch('/activate-customer/:userId', jwtAuthMiddleware, requireRole('admin'), activateCustomer);

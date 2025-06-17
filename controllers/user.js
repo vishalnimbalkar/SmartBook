@@ -16,7 +16,9 @@ const registerCustomer = async (req, res) => {
 		const [result] = await pool.query(emailQuery, [email]);
 		//if result contains user return email already exists
 		if (result.length === 1) {
-			return res.status(400).json({ success: false, message: 'Email Already Exists. Please try another Email or User' });
+			return res
+				.status(400)
+				.json({ success: false, message: 'Email Already Exists. Please try another Email or User' });
 		}
 
 		// Hash the password using bcryptjs
@@ -36,7 +38,9 @@ const registerCustomer = async (req, res) => {
 		// If everything succeeds, commit transaction
 		await connection.commit();
 		connection.release();
-		return res.status(201).json({ success: true, message: 'Customer Registered Successfully. Please verify your email.' });
+		return res
+			.status(201)
+			.json({ success: true, message: 'Customer Registered Successfully. Please verify your email.' });
 	} catch (error) {
 		await connection.rollback();
 		connection.release();
@@ -264,12 +268,12 @@ const getAllCustomers = async (req, res) => {
 		const { name, email, isActive, isVerified } = req.query;
 		let { sortBy, orderBy } = req.query;
 
-		// validate sorting columns and orderby 
+		// validate sorting columns and orderby
 		const allowedSortBy = ['name', 'email', 'createdAt'];
 		sortBy = allowedSortBy.includes(sortBy) ? sortBy : 'createdAt';
 		orderBy = orderBy === 'desc' ? 'desc' : 'asc';
 
-		// filters 
+		// filters
 		const filters = [`role = 'customer'`];
 		const values = [];
 
@@ -306,14 +310,16 @@ const getAllCustomers = async (req, res) => {
 			[...values, limit, offset]
 		);
 
-		res.status(200).json({
-			success: true,
-			message: 'Customers data fetched successfully',
-			currentPage: page,
-			totalPages,
-			totalUsers,
-			users: rows
-		});
+		res
+			.status(200)
+			.json({
+				success: true,
+				message: 'Customers data fetched successfully',
+				currentPage: page,
+				totalPages,
+				totalUsers,
+				users: rows,
+			});
 	} catch (error) {
 		console.error(error);
 		res.status(500).json({ success: false, message: error.message });
@@ -382,5 +388,5 @@ module.exports = {
 	resetPassword,
 	getAllCustomers,
 	deactivateCustomer,
-	activateCustomer
+	activateCustomer,
 };
