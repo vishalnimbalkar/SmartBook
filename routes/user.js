@@ -8,7 +8,6 @@ const {
 	updateProfile,
 	deleteUser,
 	forgotPassword,
-	resetPasswordForm,
 	resetPassword,
 	getAllCustomers,
 	deactivateCustomer,
@@ -22,7 +21,6 @@ router.post('/register', registerCustomer);
 router.get('/verify', verifyUser);
 router.post('/login', login);
 router.post('/forgot-password', forgotPassword);
-router.get('/reset-password', resetPasswordForm); // render EJS form
 router.post('/reset-password', resetPassword); // handle reset password
 
 // Customer management by admin
@@ -31,6 +29,7 @@ router.patch('/deactivate-customer/:userId', jwtAuthMiddleware, requireRole('adm
 router.patch('/activate-customer/:userId', jwtAuthMiddleware, requireRole('admin'), activateCustomer);
 
 // Customer Profile
+//get id from req.user
 router.get('/:id', jwtAuthMiddleware, getUserDetailsById);
 router.patch('/update/:id', jwtAuthMiddleware, requireRole('customer'), updateProfile);
 router.delete('/delete/:id', jwtAuthMiddleware, requireRole('customer'), deleteUser);

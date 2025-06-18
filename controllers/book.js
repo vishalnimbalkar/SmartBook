@@ -122,7 +122,7 @@ const getAllBooks = async (req, res) => {
 
         // Books data
         const [books] = await pool.query(
-            `SELECT b.id, b.title, b.description, b.price, b.stock, b.coverPageUrl, b.authorName, b.categoryId, c.name AS categoryName,b.createdAt, b.updatedAt 
+            `SELECT b.id, b.title, b.description, b.price, b.stock, b.coverPage, b.authorName, b.categoryId, c.name AS categoryName,b.createdAt, b.updatedAt 
             FROM mst_books b
             JOIN mst_categories c 
             ON b.categoryId = c.id
@@ -132,9 +132,13 @@ const getAllBooks = async (req, res) => {
             [...values, limit, offset]
         );
 
-        //add full url in coverPageUrl
         const booksWithImage = books.map(book => {
-            book.coverPageUrl = `${req.protocol}://${req.get('host')}/${book.coverPageUrl}`;
+            if (book.coverPage) {
+                const base64Image = book.coverPage.toString('base64');
+                book.coverPage = `data:image/jpeg;base64,${base64Image}`;
+            } else {
+                book.coverPage = null;
+            }
             return book;
         });
         res.status(200)
@@ -155,22 +159,22 @@ const getAllBooks = async (req, res) => {
 //function update book details
 const updateBook = async (req, res) => {
     try {
-        const { title, description, price, stock, authorName, categoryId } = req.body;
-        const coverPageUrl = req.file ? `uploads/books/${req.file.filename}` : undefined;
+        const { title, description, price, stock, authorName, categoryId } = req.body || {};
         const bookId = Number(req.params.bookId);
         //check bookId is valid or not
         if (isNaN(bookId)) {
             return res.status(400).json({ success: false, message: 'Invalid book ID' });
         }
         //check book exists or not
-        const idQuery = `select id, title, description, price, stock, coverPageUrl, authorName, categoryId createdAt, updatedAt from mst_books where id = ? LIMIT 1`;
+        const idQuery = `select id, title, description, price, stock, coverPage, authorName, categoryId, createdAt, updatedAt from mst_books where id = ? LIMIT 1`;
         const [result] = await pool.query(idQuery, [bookId]);
         const book = result[0];
         //if result is empty
         if (!book) {
             return res.status(404).json({ success: false, message: 'Book not found' });
         }
-        const fields = { title, description, price, stock, coverPageUrl, authorName, categoryId };
+
+        const fields = { title, description, price, stock, authorName, categoryId };
         const fieldsToUpdates = [];
         const values = [];
 
@@ -181,14 +185,25 @@ const updateBook = async (req, res) => {
                 values.push(value);
             }
         }
+
+        //check and update cover image as BLOB
+        if (req.file) {
+            const filePath = path.join(__dirname, '../uploads/books', req.file.filename);
+            const imageBuffer = fs.readFileSync(filePath);
+            fs.unlinkSync(filePath); // delete after reading
+            fieldsToUpdates.push(`coverPage = ?`);
+            values.push(imageBuffer);
+        }
+
         // If no valid fields to update
         if (fieldsToUpdates.length === 0) {
             return res.status(400).json({ success: false, message: 'Please provide valid fields for update.' });
         }
-        // Push category id at the end of the values
+
+        // Push book id at the end of the values
         values.push(bookId);
 
-        //Query to update category
+        //Query to update book
         const query = `update mst_books set ${fieldsToUpdates.join(', ')} where id = ?`;
         await pool.query(query, values);
         return res.status(200).json({ success: true, message: 'Book updated successfully' });

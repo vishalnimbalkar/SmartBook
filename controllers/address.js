@@ -4,7 +4,7 @@ const { pool } = require('../config/database');
 const addAddress = async (req, res) => {
 	try {
 		const { addressLine, city, state, zipCode, country } = req.body;
-		const userId = Number(req.params.userId);
+		const userId = Number(req.user.id);
 		//check id is valid or not
 		if (isNaN(userId)) {
 			return res.status(400).json({ success: false, message: 'Invalid User ID' });
@@ -23,7 +23,7 @@ const addAddress = async (req, res) => {
 // function get addresses by user id
 const getAddressByUserId = async (req, res) => {
 	try {
-		const userId = Number(req.params.userId);
+		const userId = Number(req.user.id);
 		//check id is valid or not
 		if (isNaN(userId)) {
 			return res.status(400).json({ success: false, message: 'Invalid User ID' });

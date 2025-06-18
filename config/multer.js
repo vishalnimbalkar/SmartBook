@@ -14,10 +14,12 @@ const upload = multer({
     storage: storage,
     // Validation for file type
     fileFilter: function (req, file, cb) {
-        if (!file.originalname.match(/\.(jpg|jpeg|png)$/)) {
-            return cb(new multer.MulterError('FILE_TYPE_INVALID', 'Only image files are allowed.'));
+        const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
+        if (allowedTypes.includes(file.mimetype)) {
+            cb(null, true);
+        } else {
+            cb(new Error('Only JPEG, PNG, and WEBP images are allowed'), false);
         }
-        cb(null, true);
     },
     // Validation for file size
     limits: {

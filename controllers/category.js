@@ -136,6 +136,18 @@ const deleteCatogory = async (req, res) => {
 		if (isNaN(categoryId)) {
 			return res.status(400).json({ success: false, message: 'Invalid category ID' });
 		}
+
+		// Check if any books are using this category
+		const countQuery = `select count(*) from mst_books where categoryId = ?`;
+		const [books] = await pool.query(countQuery, [categoryId]);
+		if (books[0].count > 0) {
+			return res.status(400).json({
+				success: false,
+				message: 'Cannot delete category: it is used by one or more books.',
+			});
+		}
+
+		//proceed with delete
 		const query = `delete from mst_categories where id = ?`;
 		const [result] = await pool.query(query, [categoryId]);
 		//check category exists or not

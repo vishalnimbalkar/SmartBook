@@ -59,22 +59,23 @@ const verifyUser = async (req, res) => {
 		const [row] = await pool.query(query, [email, verificationToken]);
 		const user = row[0];
 		if (!user) {
-			return res.render('verifySuccess', {
+			return res.status(400).json({
 				success: false,
 				message: 'Your email is already verified.',
-				loginUrl: `${process.env.CLIENT_URL}/login`,
 			});
 		}
 		// Set verification token null and mark user as verified
 		await pool.query(`update mst_users set isVerified = 1, verificationToken = null where email = ?`, [email]);
 		// return res.status(200).json({ success: true, message: 'User verified successfully.' });
-		return res.render('verifySuccess', { success: true, name: user.name, loginUrl: `${process.env.CLIENT_URL}/login` });
+		return res.status(400).json({
+			success: true,
+			message: 'Your email verified successfully.',
+		});
 	} catch (error) {
 		console.log(error);
-		return res.render('verifySuccess', {
+		return res.status(500).json({
 			success: false,
-			message: 'Something went wrong during verification. Please try again later.',
-			loginUrl: `${process.env.CLIENT_URL}/login`,
+			message: error.message,
 		});
 	}
 };
@@ -218,25 +219,15 @@ const forgotPassword = async (req, res) => {
 		//generate token with 15 min expire time
 		const token = jwt.sign({ email }, process.env.JWT_FORGOT_PASSWORD_KEY, { expiresIn: '15m' });
 		//sending forgot password email
+		console.log(token);
 		await forgotPasswordEmail(token, email, user.name);
 		return res.status(200).json({ success: true, message: 'If the email is registered, a reset link will be sent.' });
 	} catch (error) {
 		console.log(error);
+		if (err.name === 'TokenExpiredError') {
+			return res.status(400).json({ success: false, message: 'Reset link expired. Please request again.' });
+		}
 		return res.status(500).json({ success: false, message: error.message });
-	}
-};
-
-// function renders reset password form after clicking on reset password button from email
-const resetPasswordForm = async (req, res) => {
-	try {
-		const { verificationToken } = req.query;
-		//verify token
-		jwt.verify(verificationToken, process.env.JWT_FORGOT_PASSWORD_KEY);
-		// render reset password form after token verification
-		res.render('resetPassword', { success: true, verificationToken });
-	} catch (error) {
-		console.log(error);
-		res.render('resetPassword', { success: false, loginUrl: `${process.env.CLIENT_URL}/login` });
 	}
 };
 
@@ -250,10 +241,13 @@ const resetPassword = async (req, res) => {
 		// hashed password before storing into database
 		const hashedPassword = await bcrypt.hash(password, 10);
 		await pool.query('update mst_users set password = ? where email = ?', [hashedPassword, email]);
-		res.render('resetSuccess', { success: true, loginUrl: `${process.env.CLIENT_URL}/login` });
+		res.status(200).json({ success: true, message: 'Password reset successfully' });
 	} catch (error) {
 		console.log(error);
-		res.render('resetSuccess', { success: false, loginUrl: `${process.env.CLIENT_URL}/login` });
+		if (err.name === 'TokenExpiredError') {
+			return res.status(400).json({ success: false, message: 'Reset link expired. Please request again.' });
+		}
+		res.status(500).json({ success: false, message: error.message });
 	}
 };
 
@@ -384,7 +378,6 @@ module.exports = {
 	updateProfile,
 	deleteUser,
 	forgotPassword,
-	resetPasswordForm,
 	resetPassword,
 	getAllCustomers,
 	deactivateCustomer,

@@ -6,6 +6,8 @@ const userRoutes = require('./routes/user.js');
 const addressRoutes = require('./routes/address.js');
 const categoryRoutes = require('./routes/category.js');
 const bookRoutes = require('./routes/book.js');
+const cartRoutes = require('./routes/cart.js');
+const orderRoutes = require('./routes/order.js');
 
 const port = process.env.PORT;
 const app = express();
@@ -21,6 +23,8 @@ app.use('/user', userRoutes);
 app.use('/address', addressRoutes);
 app.use('/category', categoryRoutes);
 app.use('/book', bookRoutes);
+app.use('/cart', cartRoutes);
+app.use('/order', orderRoutes);
 
 const server = http.createServer(app);
 server.listen(port, () => {
