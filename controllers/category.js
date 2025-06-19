@@ -67,7 +67,8 @@ const getAllCategories = async (req, res) => {
 			[...values, limit, offset]
 		);
 
-		res.status(200)
+		res
+			.status(200)
 			.json({
 				success: true,
 				message: 'Categories data fetched successfully',
@@ -173,7 +174,7 @@ const deleteCatogory = async (req, res) => {
 				return res.status(400).json({ success: false, message: 'Category not found' });
 			}
 		} else {
-			// proceed with delete 
+			// proceed with delete
 			const query = `delete from mst_categories where id = ?`;
 			const [result] = await pool.query(query, [categoryId]);
 			//check category exists or not

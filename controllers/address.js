@@ -128,7 +128,7 @@ const deleteAddress = async (req, res) => {
 			[addressId]
 		);
 		if (cnt > 0) {
-			await pool.query(`update user_addresses set isActive = 0 where id = ?`, [addressId])
+			await pool.query(`update user_addresses set isActive = 0 where id = ?`, [addressId]);
 		} else {
 			//safe to delete
 			const query = 'delete from user_addresses where id = ?';

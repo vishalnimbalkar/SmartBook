@@ -2,13 +2,13 @@ const express = require('express');
 const { jwtAuthMiddleware } = require('../middlewares/jwt.js');
 const { requireRole } = require('../middlewares/user.js');
 const {
-    addReview,
-    getReviewByBookId,
-    getReviewByUserIdBookId,
-    updateReview,
-    deleteReview,
-    getAllReviews,
-    getReviewById,
+	addReview,
+	getReviewByBookId,
+	getReviewByUserIdBookId,
+	updateReview,
+	deleteReview,
+	getAllReviews,
+	getReviewById,
 } = require('../controllers/review.js');
 const router = express.Router();
 

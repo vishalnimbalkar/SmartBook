@@ -26,15 +26,14 @@ const placeOrder = async (req, res) => {
 		for (const book of cartBooks) {
 			if (book.stock < book.quantity) {
 				await connection.rollback();
-				return res.status(400).json({
-					success: false,
-					message: `Not enough stock for bookId ${book.bookId}. Only ${book.stock} left.`
-				});
+				return res
+					.status(400)
+					.json({ success: false, message: `Not enough stock for bookId ${book.bookId}. Only ${book.stock} left.` });
 			}
 		}
 		// 3. Calculate total amount
 		let totalAmount = 0;
-		cartBooks.forEach(book => {
+		cartBooks.forEach((book) => {
 			totalAmount += book.quantity * book.price;
 		});
 		// 4. Insert into orders
@@ -45,24 +44,19 @@ const placeOrder = async (req, res) => {
 		const [orderResult] = await connection.query(insertOrderQuery, [userId, addressId, orderMethod, totalAmount]);
 		const orderId = orderResult.insertId;
 		// 5. Insert into order_books
-		const orderBooksValues = cartBooks.map(book => { return [orderId, book.bookId, book.quantity, book.price]; });
+		const orderBooksValues = cartBooks.map((book) => {
+			return [orderId, book.bookId, book.quantity, book.price];
+		});
 		await connection.query(`INSERT INTO order_books (orderId, bookId, quantity, price) VALUES ?`, [orderBooksValues]);
 		// 6. Decrease stock for each book
 		for (const book of cartBooks) {
-			await connection.query(
-				`UPDATE mst_books SET stock = stock - ? WHERE id = ?`,
-				[book.quantity, book.bookId]
-			);
+			await connection.query(`UPDATE mst_books SET stock = stock - ? WHERE id = ?`, [book.quantity, book.bookId]);
 		}
 		// 7. Clear cart
 		await connection.query(`DELETE FROM cart_books WHERE userId = ?`, [userId]);
 
 		await connection.commit();
-		res.status(200).json({
-			success: true,
-			message: 'Order placed successfully',
-			orderData: { orderId, totalAmount }
-		});
+		res.status(200).json({ success: true, message: 'Order placed successfully', orderData: { orderId, totalAmount } });
 	} catch (error) {
 		await connection.rollback();
 		console.error(error);
@@ -169,17 +163,18 @@ const cancelOrder = async (req, res) => {
 		const [order] = await connection.query(
 			`SELECT id, userId, addressId, deliveredDate, orderMethod, orderStatus, totalAmount, createdAt, updatedAt
    			FROM orders
-   			WHERE id = ? LIMIT 1`, [orderId]);
+   			WHERE id = ? LIMIT 1`,
+			[orderId]
+		);
 		if (order.length === 0) {
 			await connection.rollback();
 			return res.status(404).json({ success: false, message: 'Order not found' });
 		}
 		if (['Cancelled', 'Delivered'].includes(order[0].orderStatus)) {
 			await connection.rollback();
-			return res.status(400).json({
-				success: false,
-				message: `Cannot cancel an order that is already ${order[0].orderStatus}`
-			});
+			return res
+				.status(400)
+				.json({ success: false, message: `Cannot cancel an order that is already ${order[0].orderStatus}` });
 		}
 
 		// 2) Update order status to 'Cancelled'

@@ -110,7 +110,10 @@ const getAllBooks = async (req, res) => {
 		const whereClause = filters.length ? `and ${filters.join(' and ')}` : '';
 
 		// calculating total pages and books
-		const [countRows] = await pool.query(`select count(*) as count from mst_books where isActive = 1 ${whereClause}`, values);
+		const [countRows] = await pool.query(
+			`select count(*) as count from mst_books where isActive = 1 ${whereClause}`,
+			values
+		);
 		const totalBooks = countRows[0].count;
 		const totalPages = Math.ceil(totalBooks / limit);
 
@@ -184,7 +187,6 @@ const updateBook = async (req, res) => {
 
 		//check and update cover image as BLOB
 		if (req.file) {
-
 			const filePath = path.join(__dirname, '../uploads/books', req.file.filename);
 			const imageBuffer = fs.readFileSync(filePath);
 			// fs.unlinkSync(filePath); // delete after reading
@@ -220,7 +222,9 @@ const deleteBook = async (req, res) => {
 		}
 
 		//check book is used for orders or not
-		const [[{ orderCnt }]] = await pool.query(`select count(*) as orderCnt from order_books where bookId = ?`, [bookId]);
+		const [[{ orderCnt }]] = await pool.query(`select count(*) as orderCnt from order_books where bookId = ?`, [
+			bookId,
+		]);
 		const [[{ reviewCnt }]] = await pool.query(`select count(*) as reviewCnt from reviews where bookId = ?`, [bookId]);
 		if (orderCnt > 0 || reviewCnt > 0) {
 			// set inactive
