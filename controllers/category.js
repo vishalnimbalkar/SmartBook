@@ -61,13 +61,13 @@ const getAllCategories = async (req, res) => {
 			`select id, name, description, createdAt, updatedAt 
 			 from mst_categories 
 			 ${whereClause}
+			 where isActive = 1
 			 order by ${sortBy} ${orderBy}
 			 limit ? offset ?`,
 			[...values, limit, offset]
 		);
 
-		res
-			.status(200)
+		res.status(200)
 			.json({
 				success: true,
 				message: 'Categories data fetched successfully',
@@ -82,6 +82,28 @@ const getAllCategories = async (req, res) => {
 	}
 };
 
+//function to get category by id
+const getCategoryById = async (req, res) => {
+	try {
+		const categoryId = Number(req.params.categoryId);
+		//check id is valid or not
+		if (isNaN(categoryId)) {
+			return res.status(400).json({ success: false, message: 'Invalid Category ID' });
+		}
+		const [result] = await pool.query(
+			`select id, name, description, createdAt, updatedAt from mst_categories where id = ? and isActive = 1 limit 1`,
+			[categoryId]
+		);
+		if (!result[0]) {
+			return res.status(400).json({ success: false, message: 'Category not found' });
+		}
+		return res.status(200).json({ success: true, category: result[0] });
+	} catch (error) {
+		console.error(error);
+		return res.status(500).json({ success: false, message: error.message });
+	}
+};
+
 //function to update category details
 const updateCategory = async (req, res) => {
 	try {
@@ -92,7 +114,7 @@ const updateCategory = async (req, res) => {
 			return res.status(400).json({ success: false, message: 'Invalid Category ID' });
 		}
 		//check addess exists or not
-		const idQuery = `select id, name, description, createdAt, updatedAt from mst_categories where id = ? LIMIT 1`;
+		const idQuery = `select id, name, description, createdAt, updatedAt from mst_categories where id = ? and isActive = 1 LIMIT 1`;
 		const [result] = await pool.query(idQuery, [categoryId]);
 		const category = result[0];
 		//if result is empty
@@ -136,23 +158,28 @@ const deleteCatogory = async (req, res) => {
 		if (isNaN(categoryId)) {
 			return res.status(400).json({ success: false, message: 'Invalid category ID' });
 		}
-
-		// Check if any books are using this category
-		const countQuery = `select count(*) from mst_books where categoryId = ?`;
-		const [books] = await pool.query(countQuery, [categoryId]);
-		if (books[0].count > 0) {
-			return res.status(400).json({
-				success: false,
-				message: 'Cannot delete category: it is used by one or more books.',
-			});
-		}
-
-		//proceed with delete
-		const query = `delete from mst_categories where id = ?`;
-		const [result] = await pool.query(query, [categoryId]);
-		//check category exists or not
-		if (result.affectedRows === 0) {
-			return res.status(400).json({ success: false, message: 'Category not found' });
+		//Check if category is used for book or not
+		const [[{ cnt }]] = await pool.query(
+			`select count(*) as cnt
+       		from mst_books
+       		where categoryId = ?`,
+			[categoryId]
+		);
+		if (cnt > 0) {
+			const query = `update mst_categories set isActive = 0 where id = ?`;
+			const [result] = await pool.query(query, [categoryId]);
+			//check category exists or not
+			if (result.affectedRows === 0) {
+				return res.status(400).json({ success: false, message: 'Category not found' });
+			}
+		} else {
+			// proceed with delete 
+			const query = `delete from mst_categories where id = ?`;
+			const [result] = await pool.query(query, [categoryId]);
+			//check category exists or not
+			if (result.affectedRows === 0) {
+				return res.status(400).json({ success: false, message: 'Category not found' });
+			}
 		}
 		return res.status(200).json({ success: true, message: 'Category deleted successfully' });
 	} catch (error) {
@@ -161,4 +188,4 @@ const deleteCatogory = async (req, res) => {
 	}
 };
 
-module.exports = { addCatogory, getAllCategories, updateCategory, deleteCatogory };
+module.exports = { addCatogory, getAllCategories, updateCategory, deleteCatogory, getCategoryById };

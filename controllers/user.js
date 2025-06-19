@@ -59,24 +59,15 @@ const verifyUser = async (req, res) => {
 		const [row] = await pool.query(query, [email, verificationToken]);
 		const user = row[0];
 		if (!user) {
-			return res.status(400).json({
-				success: false,
-				message: 'Your email is already verified.',
-			});
+			return res.status(400).json({ success: false, message: 'Your email is already verified.' });
 		}
 		// Set verification token null and mark user as verified
 		await pool.query(`update mst_users set isVerified = 1, verificationToken = null where email = ?`, [email]);
 		// return res.status(200).json({ success: true, message: 'User verified successfully.' });
-		return res.status(400).json({
-			success: true,
-			message: 'Your email verified successfully.',
-		});
+		return res.status(400).json({ success: true, message: 'Your email verified successfully.' });
 	} catch (error) {
 		console.log(error);
-		return res.status(500).json({
-			success: false,
-			message: error.message,
-		});
+		return res.status(500).json({ success: false, message: error.message });
 	}
 };
 
@@ -147,9 +138,9 @@ const updateProfile = async (req, res) => {
 		if (isNaN(userId)) {
 			return res.status(400).json({ success: false, message: 'Invalid User ID' });
 		}
-		const { name, email, phone } = req.body;
+		const { name, phone } = req.body;
 		// Map of fields to be updated
-		const fields = { name, email, phone };
+		const fields = { name, phone };
 		const values = [];
 		const fieldsToUpdates = [];
 

@@ -29,7 +29,7 @@ const getAddressByUserId = async (req, res) => {
 			return res.status(400).json({ success: false, message: 'Invalid User ID' });
 		}
 		//fetch operation
-		const query = `select id, addressLine, city, state, zipCode, country, createdAt, updatedAt from user_addresses where userId = ?`;
+		const query = `select id, addressLine, city, state, zipCode, country, createdAt, updatedAt from user_addresses where userId = ? and isActive = 1`;
 		const [addresses] = await pool.query(query, [userId]);
 		return res
 			.status(200)
@@ -44,17 +44,39 @@ const getAddressByUserId = async (req, res) => {
 	}
 };
 
+//get address by id
+const getAddressById = async (req, res) => {
+	try {
+		const addressId = Number(req.params.addressId);
+		//check id is valid or not
+		if (isNaN(addressId)) {
+			return res.status(400).json({ success: false, message: 'Invalid Address ID' });
+		}
+		const [result] = await pool.query(
+			`select id, addressLine, city, state, zipCode, country, createdAt, updatedAt from user_addresses where id = ? and isActive = 1 limit 1`,
+			[addressId]
+		);
+		if (!result[0]) {
+			return res.status(400).json({ success: false, message: 'Address not found' });
+		}
+		return res.status(200).json({ success: true, address: result[0] });
+	} catch (error) {
+		console.error(error);
+		return res.status(500).json({ success: false, message: error.message });
+	}
+};
+
 //function update address details partially
 const updateAddress = async (req, res) => {
 	try {
 		const { addressLine, city, state, zipCode, country } = req.body;
-		const addressId = Number(req.params.id);
+		const addressId = Number(req.params.addressId);
 		//check id is valid or not
 		if (isNaN(addressId)) {
 			return res.status(400).json({ success: false, message: 'Invalid address ID' });
 		}
 		//check addess exists or not
-		const idQuery = `select id, addressLine, city, state, zipCode, createdAt, updatedAt from user_addresses where id = ? LIMIT 1`;
+		const idQuery = `select id, addressLine, city, state, zipCode, createdAt, updatedAt from user_addresses where id = ? and isActive = 1 LIMIT 1`;
 		const [result] = await pool.query(idQuery, [addressId]);
 		const address = result[0];
 		//if result is empty
@@ -93,16 +115,28 @@ const updateAddress = async (req, res) => {
 //function delete address by id
 const deleteAddress = async (req, res) => {
 	try {
-		const addressId = Number(req.params.id);
+		const addressId = Number(req.params.addressId);
 		//check id is valid or not
 		if (isNaN(addressId)) {
 			return res.status(400).json({ success: false, message: 'Invalid address ID' });
 		}
-		const query = 'delete from user_addresses where id = ?';
-		const [result] = await pool.query(query, [addressId]);
-		//check address is exists or not
-		if (result.affectedRows === 0) {
-			return res.status(404).json({ success: false, message: 'Address not found' });
+		//Check for active orders pointing at this address
+		const [[{ cnt }]] = await pool.query(
+			`select count(*) as cnt
+       		from orders
+       		where addressId = ?`,
+			[addressId]
+		);
+		if (cnt > 0) {
+			await pool.query(`update user_addresses set isActive = 0 where id = ?`, [addressId])
+		} else {
+			//safe to delete
+			const query = 'delete from user_addresses where id = ?';
+			const [result] = await pool.query(query, [addressId]);
+			//check address is exists or not
+			if (result.affectedRows === 0) {
+				return res.status(404).json({ success: false, message: 'Address not found' });
+			}
 		}
 		return res.status(200).json({ success: true, message: 'Address deleted successfully' });
 	} catch (error) {
@@ -111,4 +145,4 @@ const deleteAddress = async (req, res) => {
 	}
 };
 
-module.exports = { addAddress, getAddressByUserId, updateAddress, deleteAddress };
+module.exports = { addAddress, getAddressByUserId, updateAddress, deleteAddress, getAddressById };

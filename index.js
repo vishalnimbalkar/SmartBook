@@ -8,6 +8,7 @@ const categoryRoutes = require('./routes/category.js');
 const bookRoutes = require('./routes/book.js');
 const cartRoutes = require('./routes/cart.js');
 const orderRoutes = require('./routes/order.js');
+const reviewRoutes = require('./routes/review.js');
 
 const port = process.env.PORT;
 const app = express();
@@ -25,8 +26,17 @@ app.use('/category', categoryRoutes);
 app.use('/book', bookRoutes);
 app.use('/cart', cartRoutes);
 app.use('/order', orderRoutes);
+app.use('/review', reviewRoutes);
 
 const server = http.createServer(app);
 server.listen(port, () => {
 	console.log(`Server running on port ${port}`);
 });
+
+//category - done
+//address - done
+//review - done
+//book - testing..
+//cart - done(no testing needed)
+//order - testing
+//user - delete 
