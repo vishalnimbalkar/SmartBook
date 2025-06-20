@@ -14,10 +14,12 @@ const {
 	activateCustomer,
 } = require('../controllers/user');
 const { requireRole } = require('../middlewares/user.js');
+const { validate } = require('../middlewares/schemaValidatoin.js');
+const userSchema = require('../schemas/user.js');
 const router = express.Router();
 
 // Authentication
-router.post('/register', registerCustomer);
+router.post('/register', validate(userSchema), registerCustomer);
 router.get('/verify', verifyUser);
 router.post('/login', login);
 router.post('/forgot-password', forgotPassword);

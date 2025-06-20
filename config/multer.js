@@ -27,4 +27,6 @@ const upload = multer({
 	},
 });
 
-module.exports = { upload };
+const addCoverPage = upload.single('coverPage');
+
+module.exports = { addCoverPage };

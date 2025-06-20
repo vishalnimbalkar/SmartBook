@@ -4,8 +4,6 @@ const { pool } = require('../config/database.js');
 const addReview = async (req, res) => {
 	try {
 		const userId = Number(req.user.id);
-		console.log(userId);
-
 		//check id is valid or not
 		if (isNaN(userId)) {
 			return res.status(400).json({ success: false, message: 'Invalid User ID' });
@@ -69,7 +67,7 @@ const getAllReviews = async (req, res) => {
              limit ? offset ?`,
 			[...values, limit, offset]
 		);
-		res
+		return res
 			.status(200)
 			.json({
 				success: true,
@@ -81,7 +79,7 @@ const getAllReviews = async (req, res) => {
 			});
 	} catch (error) {
 		console.error(error);
-		res.status(500).json({ success: false, message: error.message });
+		return res.status(500).json({ success: false, message: error.message });
 	}
 };
 

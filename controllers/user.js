@@ -232,13 +232,13 @@ const resetPassword = async (req, res) => {
 		// hashed password before storing into database
 		const hashedPassword = await bcrypt.hash(password, 10);
 		await pool.query('update mst_users set password = ? where email = ?', [hashedPassword, email]);
-		res.status(200).json({ success: true, message: 'Password reset successfully' });
+		return res.status(200).json({ success: true, message: 'Password reset successfully' });
 	} catch (error) {
 		console.log(error);
 		if (err.name === 'TokenExpiredError') {
 			return res.status(400).json({ success: false, message: 'Reset link expired. Please request again.' });
 		}
-		res.status(500).json({ success: false, message: error.message });
+		return res.status(500).json({ success: false, message: error.message });
 	}
 };
 
@@ -295,7 +295,7 @@ const getAllCustomers = async (req, res) => {
 			[...values, limit, offset]
 		);
 
-		res
+		return res
 			.status(200)
 			.json({
 				success: true,
@@ -307,7 +307,7 @@ const getAllCustomers = async (req, res) => {
 			});
 	} catch (error) {
 		console.error(error);
-		res.status(500).json({ success: false, message: error.message });
+		return res.status(500).json({ success: false, message: error.message });
 	}
 };
 
@@ -332,7 +332,7 @@ const deactivateCustomer = async (req, res) => {
 		return res.status(200).json({ success: true, message: 'User deactivated successfully' });
 	} catch (error) {
 		console.error(error);
-		res.status(500).json({ success: false, message: error.message });
+		return res.status(500).json({ success: false, message: error.message });
 	}
 };
 
@@ -357,7 +357,7 @@ const activateCustomer = async (req, res) => {
 		return res.status(200).json({ success: true, message: 'User activated successfully' });
 	} catch (error) {
 		console.error(error);
-		res.status(500).json({ success: false, message: error.message });
+		return res.status(500).json({ success: false, message: error.message });
 	}
 };
 

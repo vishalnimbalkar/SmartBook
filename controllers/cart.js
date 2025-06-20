@@ -8,7 +8,7 @@ const addBookToCart = async (req, res) => {
 		//check book exists or not
 		const [book] = await pool.query(`select id, title, stock from mst_books where id = ? limit 1`, [bookId]);
 		if (!book[0]) {
-			res.status(400).json({ success: false, message: 'Book not found' });
+			return res.status(400).json({ success: false, message: 'Book not found' });
 		}
 		const query = `select id from cart_books where userId = ? and bookId = ?`;
 		const [rows] = await pool.query(query, [userId, bookId]);
@@ -22,10 +22,10 @@ const addBookToCart = async (req, res) => {
 			const insertQuery = `insert into cart_books(userId, bookId, quantity) values (?,?,?)`;
 			await pool.query(insertQuery, [userId, bookId, quantity]);
 		}
-		res.status(200).json({ success: true, message: 'Book added in cart' });
+		return res.status(200).json({ success: true, message: 'Book added in cart' });
 	} catch (error) {
 		console.error(error);
-		res.status(500).json({ success: false, message: error.message });
+		return res.status(500).json({ success: false, message: error.message });
 	}
 };
 
@@ -44,12 +44,12 @@ const getCartByUserId = async (req, res) => {
 		const [rows] = await pool.query(query, [userId]);
 		//check for empty cart
 		if (rows.length === 0) {
-			res.status(400).json({ success: false, message: 'Cart is empty' });
+			return res.status(400).json({ success: false, message: 'Cart is empty' });
 		}
-		res.status(200).json({ success: true, books: rows });
+		return res.status(200).json({ success: true, books: rows });
 	} catch (error) {
 		console.error(error);
-		res.status(500).json({ success: false, message: error.message });
+		return res.status(500).json({ success: false, message: error.message });
 	}
 };
 
@@ -59,19 +59,19 @@ const updateQunatity = async (req, res) => {
 		const userId = Number(req.user.id);
 		const bookId = Number(req.params.bookId);
 		if (isNaN(bookId)) {
-			res.status(400).json({ success: false, message: 'Invalid Book Id' });
+			return res.status(400).json({ success: false, message: 'Invalid Book Id' });
 		}
 		const { quantity } = req.body;
 		const [book] = await pool.query(`select id, stock from mst_books where id = ? limit 1`, [bookId]);
 		if (book[0].stock < quantity) {
-			res.status(400).json({ success: false, message: 'Not enough stock for book' });
+			return res.status(400).json({ success: false, message: 'Not enough stock for book' });
 		}
 		const updateQuery = `update cart_books set quantity = ? where userId = ? and bookId = ?`;
 		await pool.query(updateQuery, [quantity, userId, bookId]);
-		res.status(200).json({ success: true, message: 'Quantity updated successfully' });
+		return res.status(200).json({ success: true, message: 'Quantity updated successfully' });
 	} catch (error) {
 		console.error(error);
-		res.status(500).json({ success: false, message: error.message });
+		return res.status(500).json({ success: false, message: error.message });
 	}
 };
 
@@ -81,15 +81,23 @@ const removeBookFromCart = async (req, res) => {
 		const userId = Number(req.user.id);
 		const bookId = Number(req.params.bookId);
 		if (isNaN(userId) || isNaN(bookId)) {
-			res.status(400).json({ success: false, message: 'Invalid user or book ID' });
+			return res.status(400).json({ success: false, message: 'Invalid user or book ID' });
+		}
+		//check book is in cart or not
+		const [book] = await pool.query(`select id, bookId from cart_books where bookId = ? and userId = ?`, [
+			bookId,
+			userId,
+		]);
+		if (!book[0]) {
+			return res.status(400).json({ success: false, message: 'Book not found in cart' });
 		}
 		//remove operation
 		const deleteQuery = `delete from cart_books where userId = ? and bookId = ?`;
 		await pool.query(deleteQuery, [userId, bookId]);
-		res.status(200).json({ success: true, message: 'Book reomved from cart' });
+		return res.status(200).json({ success: true, message: 'Book reomved from cart' });
 	} catch (error) {
 		console.error(error);
-		res.status(500).json({ success: false, message: error.message });
+		return res.status(500).json({ success: false, message: error.message });
 	}
 };
 
@@ -98,15 +106,15 @@ const clearCart = async (req, res) => {
 	try {
 		const userId = Number(req.user.id);
 		if (isNaN(userId)) {
-			res.status(400).json({ success: false, message: 'Invalid User ID' });
+			return res.status(400).json({ success: false, message: 'Invalid User ID' });
 		}
 		//clear operation
 		const query = `delete from cart_books where userId = ?`;
 		await pool.query(query, [userId]);
-		res.status(200).json({ success: true, message: 'Cart cleared' });
+		return res.status(200).json({ success: true, message: 'Cart cleared' });
 	} catch (error) {
 		console.error(error);
-		res.status(500).json({ success: false, message: error.message });
+		return res.status(500).json({ success: false, message: error.message });
 	}
 };
 

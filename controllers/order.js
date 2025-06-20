@@ -56,11 +56,13 @@ const placeOrder = async (req, res) => {
 		await connection.query(`DELETE FROM cart_books WHERE userId = ?`, [userId]);
 
 		await connection.commit();
-		res.status(200).json({ success: true, message: 'Order placed successfully', orderData: { orderId, totalAmount } });
+		return res
+			.status(200)
+			.json({ success: true, message: 'Order placed successfully', orderData: { orderId, totalAmount } });
 	} catch (error) {
 		await connection.rollback();
 		console.error(error);
-		res.status(500).json({ success: false, message: error.message });
+		return res.status(500).json({ success: false, message: error.message });
 	} finally {
 		connection.release();
 	}
@@ -102,10 +104,10 @@ const getAllOrders = async (req, res) => {
 				.books.push({ bookId: row.bookId, title: row.bookTitle, quantity: row.quantity, price: Number(row.price) });
 		}
 		const orders = Array.from(orderMap.values());
-		res.status(200).json({ success: true, orders });
+		return res.status(200).json({ success: true, orders });
 	} catch (error) {
 		console.error(error);
-		res.status(500).json({ success: false, message: error.message });
+		return res.status(500).json({ success: false, message: error.message });
 	}
 };
 
@@ -144,10 +146,10 @@ const getAllOrdersByUserId = async (req, res) => {
 				.books.push({ bookId: row.bookId, title: row.bookTitle, quantity: row.quantity, price: Number(row.price) });
 		}
 		const orders = Array.from(orderMap.values());
-		res.status(200).json({ success: true, orders });
+		return res.status(200).json({ success: true, orders });
 	} catch (error) {
 		console.error(error);
-		res.status(500).json({ success: false, message: error.message });
+		return res.status(500).json({ success: false, message: error.message });
 	}
 };
 

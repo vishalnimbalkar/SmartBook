@@ -8,10 +8,12 @@ const {
 	deleteAddress,
 } = require('../controllers/address.js');
 const { requireRole } = require('../middlewares/user.js');
+const { validate } = require('../middlewares/schemaValidatoin.js');
+const addressSchema = require('../schemas/address.js');
 const router = express.Router();
 
 //address management by customer
-router.post('/add', jwtAuthMiddleware, requireRole('customer'), addAddress);
+router.post('/add', validate(addressSchema), jwtAuthMiddleware, requireRole('customer'), addAddress);
 router.get('/get-all', jwtAuthMiddleware, requireRole('customer'), getAddressByUserId);
 router.get('/:addressId', jwtAuthMiddleware, getAddressById);
 router.patch('/:addressId', jwtAuthMiddleware, requireRole('customer'), updateAddress);

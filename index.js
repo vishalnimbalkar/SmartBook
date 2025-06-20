@@ -1,6 +1,7 @@
 require('dotenv').config();
 const http = require('http');
 const express = require('express');
+const cors = require('cors');
 const path = require('path');
 const userRoutes = require('./routes/user.js');
 const addressRoutes = require('./routes/address.js');
@@ -12,11 +13,20 @@ const reviewRoutes = require('./routes/review.js');
 
 const port = process.env.PORT;
 const app = express();
+
+// CORS config
+const corsOptions = {
+	origin: process.env.CLIENT_URL,
+	methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
+	allowedHeaders: ['Content-Type', 'Authorization'],
+	credentials: true,
+};
+app.use(cors(corsOptions));
+
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'utilities', 'templates'));
 app.use('/images', express.static(path.join(__dirname, 'utilities/images')));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
-// Required to parse form data from POST requests
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
@@ -32,11 +42,3 @@ const server = http.createServer(app);
 server.listen(port, () => {
 	console.log(`Server running on port ${port}`);
 });
-
-//category - done
-//address - done
-//review - done
-//book - testing..
-//cart - done(no testing needed)
-//order - testing
-//user - delete

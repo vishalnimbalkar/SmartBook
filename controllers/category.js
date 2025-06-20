@@ -67,7 +67,7 @@ const getAllCategories = async (req, res) => {
 			[...values, limit, offset]
 		);
 
-		res
+		return res
 			.status(200)
 			.json({
 				success: true,
@@ -79,7 +79,7 @@ const getAllCategories = async (req, res) => {
 			});
 	} catch (error) {
 		console.error(error);
-		res.status(500).json({ success: false, message: error.message });
+		return res.status(500).json({ success: false, message: error.message });
 	}
 };
 

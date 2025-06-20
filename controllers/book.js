@@ -61,7 +61,7 @@ const getBookById = async (req, res) => {
 		return res.status(200).json({ success: true, message: 'Book fetched successfully', book });
 	} catch (error) {
 		console.error(error);
-		res.status(500).json({ success: false, message: error.message });
+		return res.status(500).json({ success: false, message: error.message });
 	}
 };
 
@@ -138,7 +138,7 @@ const getAllBooks = async (req, res) => {
 			}
 			return book;
 		});
-		res
+		return res
 			.status(200)
 			.json({
 				success: true,
@@ -150,7 +150,7 @@ const getAllBooks = async (req, res) => {
 			});
 	} catch (error) {
 		console.error(error);
-		res.status(500).json({ success: false, message: error.message });
+		return res.status(500).json({ success: false, message: error.message });
 	}
 };
 
@@ -189,7 +189,7 @@ const updateBook = async (req, res) => {
 		if (req.file) {
 			const filePath = path.join(__dirname, '../uploads/books', req.file.filename);
 			const imageBuffer = fs.readFileSync(filePath);
-			// fs.unlinkSync(filePath); // delete after reading
+			fs.unlinkSync(filePath); // delete after reading
 			fieldsToUpdates.push(`coverPage = ?`);
 			values.push(imageBuffer);
 		}
@@ -235,7 +235,7 @@ const deleteBook = async (req, res) => {
 			}
 		} else {
 			//proceed to delete
-			const query = `delete from mst_books where id = ?`;
+			const query = `delete from mst_books where id = ? and isActive = 1`;
 			const [result] = await pool.query(query, [bookId]);
 			//check book deleted or not
 			if (result.affectedRows === 0) {

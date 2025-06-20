@@ -8,10 +8,12 @@ const {
 	getCategoryById,
 } = require('../controllers/category.js');
 const { requireRole } = require('../middlewares/user.js');
+const { validate } = require('../middlewares/schemaValidatoin.js');
+const categorySchema = require('../schemas/category.js');
 const router = express.Router();
 
 //category management by admin
-router.post('/add', jwtAuthMiddleware, requireRole('admin'), addCatogory);
+router.post('/add', validate(categorySchema), jwtAuthMiddleware, requireRole('admin'), addCatogory);
 router.get('/get-all-categories', jwtAuthMiddleware, requireRole('admin'), getAllCategories);
 router.get('/:categoryId', getCategoryById);
 router.patch('/:categoryId', jwtAuthMiddleware, requireRole('admin'), updateCategory);

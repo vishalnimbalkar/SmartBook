@@ -10,9 +10,11 @@ const {
 	getAllReviews,
 	getReviewById,
 } = require('../controllers/review.js');
+const { validate } = require('../middlewares/schemaValidatoin.js');
+const reviewSchema = require('../schemas/review.js');
 const router = express.Router();
 
-router.post('/add', jwtAuthMiddleware, requireRole('customer'), addReview);
+router.post('/add', validate(reviewSchema), jwtAuthMiddleware, requireRole('customer'), addReview);
 router.get('/get-all-reviews', jwtAuthMiddleware, requireRole('admin'), getAllReviews);
 router.get('/get-book-reviews/:bookId', jwtAuthMiddleware, getReviewByBookId);
 router.get('/get-review/:bookId', jwtAuthMiddleware, getReviewByUserIdBookId);

@@ -15,5 +15,4 @@ router.get('/get-all-books', jwtAuthMiddleware, requireRole('customer'), getCart
 router.patch('/:bookId', jwtAuthMiddleware, requireRole('customer'), updateQunatity);
 router.delete('/remove/:bookId', jwtAuthMiddleware, requireRole('customer'), removeBookFromCart);
 router.delete('/clear', jwtAuthMiddleware, requireRole('customer'), clearCart);
-
 module.exports = router;
