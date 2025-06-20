@@ -22,7 +22,6 @@ const addReview = async (req, res) => {
 		await pool.query(query, [userId, bookId, rating, comment]);
 		return res.status(200).json({ success: true, message: 'Review added successfully' });
 	} catch (error) {
-		console.log(error);
 		return res.status(500).json({ success: false, message: error.message });
 	}
 };
@@ -78,7 +77,6 @@ const getAllReviews = async (req, res) => {
 				users: rows,
 			});
 	} catch (error) {
-		console.error(error);
 		return res.status(500).json({ success: false, message: error.message });
 	}
 };
@@ -101,7 +99,6 @@ const getReviewByBookId = async (req, res) => {
 		const [reviews] = await pool.query(query, [bookId]);
 		return res.status(200).json({ success: true, reviews });
 	} catch (error) {
-		console.log(error);
 		return res.status(500).json({ success: false, message: error.message });
 	}
 };
@@ -125,7 +122,6 @@ const getReviewByUserIdBookId = async (req, res) => {
 		const [review] = await pool.query(query, [bookId, userId]);
 		return res.status(200).json({ success: true, review });
 	} catch (error) {
-		console.log(error);
 		return res.status(500).json({ success: false, message: error.message });
 	}
 };
@@ -146,7 +142,6 @@ const getReviewById = async (req, res) => {
 		const review = result[0];
 		return res.status(200).json({ success: true, review });
 	} catch (error) {
-		console.log(error);
 		return res.status(500).json({ success: false, message: error.message });
 	}
 };
@@ -189,7 +184,6 @@ const updateReview = async (req, res) => {
 		}
 		return res.status(200).json({ success: true, message: 'Review details updated successfully' });
 	} catch (error) {
-		console.log(error);
 		return res.status(500).json({ success: false, message: error.message });
 	}
 };
@@ -210,7 +204,6 @@ const deleteReview = async (req, res) => {
 		}
 		return res.status(200).json({ success: true, message: 'Review deleted successfully' });
 	} catch (error) {
-		console.log(error);
 		return res.status(500).json({ success: false, message: error.message });
 	}
 };

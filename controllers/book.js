@@ -24,7 +24,6 @@ const addBook = async (req, res) => {
 		await pool.query(query, bookData);
 		return res.status(201).json({ success: true, message: 'Book added successfully' });
 	} catch (error) {
-		console.error(error);
 		return res.status(500).json({ success: false, message: error.message });
 	}
 };
@@ -60,7 +59,6 @@ const getBookById = async (req, res) => {
 		}
 		return res.status(200).json({ success: true, message: 'Book fetched successfully', book });
 	} catch (error) {
-		console.error(error);
 		return res.status(500).json({ success: false, message: error.message });
 	}
 };
@@ -149,7 +147,6 @@ const getAllBooks = async (req, res) => {
 				books: booksWithImage,
 			});
 	} catch (error) {
-		console.error(error);
 		return res.status(500).json({ success: false, message: error.message });
 	}
 };
@@ -157,7 +154,6 @@ const getAllBooks = async (req, res) => {
 //function update book details
 const updateBook = async (req, res) => {
 	try {
-		console.log(req.file);
 		const { title, description, price, stock, authorName, categoryId } = req.body || {};
 		const bookId = Number(req.params.bookId);
 		//check bookId is valid or not
@@ -207,7 +203,6 @@ const updateBook = async (req, res) => {
 		await pool.query(query, values);
 		return res.status(200).json({ success: true, message: 'Book updated successfully' });
 	} catch (error) {
-		console.error(error);
 		return res.status(500).json({ success: false, message: error.message });
 	}
 };
@@ -244,7 +239,6 @@ const deleteBook = async (req, res) => {
 		}
 		return res.status(200).json({ success: true, message: 'Book deleted successfully' });
 	} catch (error) {
-		console.error(error);
 		return res.status(500).json({ success: false, message: error.message });
 	}
 };

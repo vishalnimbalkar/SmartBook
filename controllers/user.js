@@ -44,7 +44,6 @@ const registerCustomer = async (req, res) => {
 	} catch (error) {
 		await connection.rollback();
 		connection.release();
-		console.log(error);
 		return res.status(500).json({ success: false, message: error.message });
 	}
 };
@@ -66,7 +65,6 @@ const verifyUser = async (req, res) => {
 		// return res.status(200).json({ success: true, message: 'User verified successfully.' });
 		return res.status(400).json({ success: true, message: 'Your email verified successfully.' });
 	} catch (error) {
-		console.log(error);
 		return res.status(500).json({ success: false, message: error.message });
 	}
 };
@@ -103,7 +101,6 @@ const login = async (req, res) => {
 		const accessToken = generateToken(user);
 		return res.status(200).json({ success: true, message: 'Login successfully', user, accessToken });
 	} catch (error) {
-		console.log(error);
 		return res.status(500).json({ success: false, message: error.message });
 	}
 };
@@ -125,7 +122,6 @@ const getUserDetailsById = async (req, res) => {
 		}
 		return res.status(200).json({ success: true, message: 'Successfully get User details', user: row[0] });
 	} catch (error) {
-		console.log(error);
 		return res.status(500).json({ success: false, message: error.message });
 	}
 };
@@ -168,7 +164,6 @@ const updateProfile = async (req, res) => {
 		}
 		return res.status(200).json({ success: true, message: 'User details updated successfully' });
 	} catch (error) {
-		console.log(error);
 		return res.status(500).json({ success: false, message: error.message });
 	}
 };
@@ -189,7 +184,6 @@ const deleteUser = async (req, res) => {
 		}
 		return res.status(200).json({ success: true, message: 'User details deleted successfully' });
 	} catch (error) {
-		console.log(error);
 		return res.status(500).json({ success: false, message: error.message });
 	}
 };
@@ -210,11 +204,9 @@ const forgotPassword = async (req, res) => {
 		//generate token with 15 min expire time
 		const token = jwt.sign({ email }, process.env.JWT_FORGOT_PASSWORD_KEY, { expiresIn: '15m' });
 		//sending forgot password email
-		console.log(token);
 		await forgotPasswordEmail(token, email, user.name);
 		return res.status(200).json({ success: true, message: 'If the email is registered, a reset link will be sent.' });
 	} catch (error) {
-		console.log(error);
 		if (err.name === 'TokenExpiredError') {
 			return res.status(400).json({ success: false, message: 'Reset link expired. Please request again.' });
 		}
@@ -234,7 +226,6 @@ const resetPassword = async (req, res) => {
 		await pool.query('update mst_users set password = ? where email = ?', [hashedPassword, email]);
 		return res.status(200).json({ success: true, message: 'Password reset successfully' });
 	} catch (error) {
-		console.log(error);
 		if (err.name === 'TokenExpiredError') {
 			return res.status(400).json({ success: false, message: 'Reset link expired. Please request again.' });
 		}
@@ -306,7 +297,6 @@ const getAllCustomers = async (req, res) => {
 				users: rows,
 			});
 	} catch (error) {
-		console.error(error);
 		return res.status(500).json({ success: false, message: error.message });
 	}
 };
@@ -331,7 +321,6 @@ const deactivateCustomer = async (req, res) => {
 		await pool.query(query, [userId]);
 		return res.status(200).json({ success: true, message: 'User deactivated successfully' });
 	} catch (error) {
-		console.error(error);
 		return res.status(500).json({ success: false, message: error.message });
 	}
 };
@@ -356,7 +345,6 @@ const activateCustomer = async (req, res) => {
 		await pool.query(query, [userId]);
 		return res.status(200).json({ success: true, message: 'User activated successfully' });
 	} catch (error) {
-		console.error(error);
 		return res.status(500).json({ success: false, message: error.message });
 	}
 };

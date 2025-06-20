@@ -16,7 +16,6 @@ const addCatogory = async (req, res) => {
 		await pool.query(query, categoryData);
 		return res.status(201).json({ success: true, message: 'Category added successfully' });
 	} catch (error) {
-		console.error(error);
 		return res.status(500).json({ success: false, message: error.message });
 	}
 };
@@ -78,7 +77,6 @@ const getAllCategories = async (req, res) => {
 				categories: rows,
 			});
 	} catch (error) {
-		console.error(error);
 		return res.status(500).json({ success: false, message: error.message });
 	}
 };
@@ -100,7 +98,6 @@ const getCategoryById = async (req, res) => {
 		}
 		return res.status(200).json({ success: true, category: result[0] });
 	} catch (error) {
-		console.error(error);
 		return res.status(500).json({ success: false, message: error.message });
 	}
 };
@@ -146,7 +143,6 @@ const updateCategory = async (req, res) => {
 		await pool.query(query, values);
 		return res.status(200).json({ success: true, message: 'Category updated successfully' });
 	} catch (error) {
-		console.error(error);
 		return res.status(500).json({ success: false, message: error.message });
 	}
 };
@@ -184,7 +180,6 @@ const deleteCatogory = async (req, res) => {
 		}
 		return res.status(200).json({ success: true, message: 'Category deleted successfully' });
 	} catch (error) {
-		console.error(error);
 		return res.status(500).json({ success: false, message: error.message });
 	}
 };

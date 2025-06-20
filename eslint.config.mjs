@@ -17,6 +17,7 @@ export default defineConfig([
 			eqeqeq: 'warn',
 			'no-var': 'warn',
 			'prefer-const': 'warn',
+			'no-console': 'error',
 			camelcase: [
 				'warn',
 				{ properties: 'always', ignoreDestructuring: false, ignoreImports: false, ignoreGlobals: false },

@@ -7,10 +7,6 @@ const { multerErrorHandling } = require('../middlewares/multer.js');
 const router = express.Router();
 
 //book management by customer and admin
-router.post('/test', addCoverPage, (req, res, next) => {
-	console.log(req.file);
-	next();
-});
 router.post('/add', jwtAuthMiddleware, requireRole('admin'), addCoverPage, addBook);
 router.patch('/:bookId', jwtAuthMiddleware, requireRole('admin'), addCoverPage, updateBook);
 router.get('/get-all-books', jwtAuthMiddleware, getAllBooks);

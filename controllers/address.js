@@ -15,7 +15,6 @@ const addAddress = async (req, res) => {
 		await pool.query(query, addressData);
 		return res.status(201).json({ success: true, message: 'Address added successfully' });
 	} catch (error) {
-		console.error(error);
 		return res.status(500).json({ success: false, message: error.message });
 	}
 };
@@ -39,7 +38,6 @@ const getAddressByUserId = async (req, res) => {
 				addresses,
 			});
 	} catch (error) {
-		console.error(error);
 		return res.status(500).json({ success: false, message: error.message });
 	}
 };
@@ -61,7 +59,6 @@ const getAddressById = async (req, res) => {
 		}
 		return res.status(200).json({ success: true, address: result[0] });
 	} catch (error) {
-		console.error(error);
 		return res.status(500).json({ success: false, message: error.message });
 	}
 };
@@ -107,7 +104,6 @@ const updateAddress = async (req, res) => {
 		await pool.query(query, values);
 		return res.status(200).json({ success: true, message: 'Address updated successfully' });
 	} catch (error) {
-		console.error(error);
 		return res.status(500).json({ success: false, message: error.message });
 	}
 };
@@ -140,7 +136,6 @@ const deleteAddress = async (req, res) => {
 		}
 		return res.status(200).json({ success: true, message: 'Address deleted successfully' });
 	} catch (error) {
-		console.error(error);
 		return res.status(500).json({ success: false, message: error.message });
 	}
 };

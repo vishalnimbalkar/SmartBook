@@ -61,7 +61,6 @@ const placeOrder = async (req, res) => {
 			.json({ success: true, message: 'Order placed successfully', orderData: { orderId, totalAmount } });
 	} catch (error) {
 		await connection.rollback();
-		console.error(error);
 		return res.status(500).json({ success: false, message: error.message });
 	} finally {
 		connection.release();
@@ -106,7 +105,6 @@ const getAllOrders = async (req, res) => {
 		const orders = Array.from(orderMap.values());
 		return res.status(200).json({ success: true, orders });
 	} catch (error) {
-		console.error(error);
 		return res.status(500).json({ success: false, message: error.message });
 	}
 };
@@ -148,7 +146,6 @@ const getAllOrdersByUserId = async (req, res) => {
 		const orders = Array.from(orderMap.values());
 		return res.status(200).json({ success: true, orders });
 	} catch (error) {
-		console.error(error);
 		return res.status(500).json({ success: false, message: error.message });
 	}
 };
@@ -206,7 +203,6 @@ const cancelOrder = async (req, res) => {
 		return res.json({ success: true, message: 'Order cancelled and stock restored successfully.' });
 	} catch (err) {
 		await connection.rollback();
-		console.error(err);
 		return res.status(500).json({ success: false, message: err.message });
 	} finally {
 		connection.release();

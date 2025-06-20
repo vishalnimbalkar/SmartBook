@@ -24,7 +24,6 @@ const addBookToCart = async (req, res) => {
 		}
 		return res.status(200).json({ success: true, message: 'Book added in cart' });
 	} catch (error) {
-		console.error(error);
 		return res.status(500).json({ success: false, message: error.message });
 	}
 };
@@ -48,7 +47,6 @@ const getCartByUserId = async (req, res) => {
 		}
 		return res.status(200).json({ success: true, books: rows });
 	} catch (error) {
-		console.error(error);
 		return res.status(500).json({ success: false, message: error.message });
 	}
 };
@@ -70,7 +68,6 @@ const updateQunatity = async (req, res) => {
 		await pool.query(updateQuery, [quantity, userId, bookId]);
 		return res.status(200).json({ success: true, message: 'Quantity updated successfully' });
 	} catch (error) {
-		console.error(error);
 		return res.status(500).json({ success: false, message: error.message });
 	}
 };
@@ -96,7 +93,6 @@ const removeBookFromCart = async (req, res) => {
 		await pool.query(deleteQuery, [userId, bookId]);
 		return res.status(200).json({ success: true, message: 'Book reomved from cart' });
 	} catch (error) {
-		console.error(error);
 		return res.status(500).json({ success: false, message: error.message });
 	}
 };
@@ -113,7 +109,6 @@ const clearCart = async (req, res) => {
 		await pool.query(query, [userId]);
 		return res.status(200).json({ success: true, message: 'Cart cleared' });
 	} catch (error) {
-		console.error(error);
 		return res.status(500).json({ success: false, message: error.message });
 	}
 };
