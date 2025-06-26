@@ -17,7 +17,7 @@ const transporter = nodemailer.createTransport({
  */
 const sendVerificationEmail = async (to, name, verificationToken) => {
 	//verification api with jwt token
-	const verificationUrl = `http://localhost:3000/user/verify?verificationToken=${verificationToken}`;
+	const verificationUrl = `http://localhost:5173/user/verify?verificationToken=${verificationToken}`;
 	const ejsTemplate = await ejs.renderFile('./utilities/templates/email.ejs', { name, verificationUrl });
 	const mailOptions = {
 		from: `"SmartBook" <${process.env.EMAIL_USER}>`,
@@ -35,7 +35,7 @@ const sendVerificationEmail = async (to, name, verificationToken) => {
 
 const forgotPasswordEmail = async (verificationToken, to, name) => {
 	//verification api with jwt token
-	const resetUrl = `http://localhost:3000/user/reset-password?verificationToken=${verificationToken}`;
+	const resetUrl = `http://localhost:5173/user/reset-password?verificationToken=${verificationToken}`;
 	const ejsTemplate = await ejs.renderFile('./utilities/templates/forgotPassword.ejs', { name, resetUrl });
 	const mailOptions = {
 		from: `"SmartBook" <${process.env.EMAIL_USER}>`,
