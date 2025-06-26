@@ -20,7 +20,7 @@ const sendVerificationEmail = async (to, name, verificationToken) => {
 	const verificationUrl = `http://localhost:3000/user/verify?verificationToken=${verificationToken}`;
 	const ejsTemplate = await ejs.renderFile('./utilities/templates/email.ejs', { name, verificationUrl });
 	const mailOptions = {
-		from: process.env.EMAIL_USER,
+		from: `"SmartBook" <${process.env.EMAIL_USER}>`,
 		to,
 		subject: 'Account Created Successfully!',
 		html: ejsTemplate,
@@ -38,7 +38,7 @@ const forgotPasswordEmail = async (verificationToken, to, name) => {
 	const resetUrl = `http://localhost:3000/user/reset-password?verificationToken=${verificationToken}`;
 	const ejsTemplate = await ejs.renderFile('./utilities/templates/forgotPassword.ejs', { name, resetUrl });
 	const mailOptions = {
-		from: process.env.EMAIL_USER,
+		from: `"SmartBook" <${process.env.EMAIL_USER}>`,
 		to,
 		subject: 'Reset Password',
 		html: ejsTemplate,

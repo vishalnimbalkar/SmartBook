@@ -62,8 +62,7 @@ const verifyUser = async (req, res) => {
 		}
 		// Set verification token null and mark user as verified
 		await pool.query(`update mst_users set isVerified = 1, verificationToken = null where email = ?`, [email]);
-		// return res.status(200).json({ success: true, message: 'User verified successfully.' });
-		return res.status(400).json({ success: true, message: 'Your email verified successfully.' });
+		return res.status(200).json({ success: true, message: 'Your email verified successfully.' });
 	} catch (error) {
 		return res.status(500).json({ success: false, message: error.message });
 	}
@@ -207,7 +206,7 @@ const forgotPassword = async (req, res) => {
 		await forgotPasswordEmail(token, email, user.name);
 		return res.status(200).json({ success: true, message: 'If the email is registered, a reset link will be sent.' });
 	} catch (error) {
-		if (err.name === 'TokenExpiredError') {
+		if (error.name === 'TokenExpiredError') {
 			return res.status(400).json({ success: false, message: 'Reset link expired. Please request again.' });
 		}
 		return res.status(500).json({ success: false, message: error.message });
@@ -226,7 +225,7 @@ const resetPassword = async (req, res) => {
 		await pool.query('update mst_users set password = ? where email = ?', [hashedPassword, email]);
 		return res.status(200).json({ success: true, message: 'Password reset successfully' });
 	} catch (error) {
-		if (err.name === 'TokenExpiredError') {
+		if (error.name === 'TokenExpiredError') {
 			return res.status(400).json({ success: false, message: 'Reset link expired. Please request again.' });
 		}
 		return res.status(500).json({ success: false, message: error.message });
