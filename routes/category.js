@@ -14,7 +14,7 @@ const router = express.Router();
 
 //category management by admin
 router.post('/add', validate(categorySchema), jwtAuthMiddleware, requireRole('admin'), addCatogory);
-router.get('/get-all-categories', jwtAuthMiddleware, requireRole('admin'), getAllCategories);
+router.get('/get-all-categories', getAllCategories);
 router.get('/:categoryId', getCategoryById);
 router.patch('/:categoryId', jwtAuthMiddleware, requireRole('admin'), updateCategory);
 router.delete('/:categoryId', jwtAuthMiddleware, requireRole('admin'), deleteCatogory);

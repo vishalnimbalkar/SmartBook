@@ -9,7 +9,7 @@ const router = express.Router();
 //book management by customer and admin
 router.post('/add', jwtAuthMiddleware, requireRole('admin'), addCoverPage, addBook);
 router.patch('/:bookId', jwtAuthMiddleware, requireRole('admin'), addCoverPage, updateBook);
-router.get('/get-all-books', jwtAuthMiddleware, getAllBooks);
+router.get('/get-all-books', getAllBooks);
 router.get('/:bookId', jwtAuthMiddleware, getBookById);
 router.delete('/:bookId', jwtAuthMiddleware, requireRole('admin'), deleteBook);
 

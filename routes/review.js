@@ -16,7 +16,7 @@ const router = express.Router();
 
 router.post('/add', validate(reviewSchema), jwtAuthMiddleware, requireRole('customer'), addReview);
 router.get('/get-all-reviews', jwtAuthMiddleware, requireRole('admin'), getAllReviews);
-router.get('/get-book-reviews/:bookId', jwtAuthMiddleware, getReviewByBookId);
+router.get('/get-book-reviews/:bookId', getReviewByBookId);
 router.get('/get-review/:bookId', jwtAuthMiddleware, getReviewByUserIdBookId);
 router.get('/:reviewId', jwtAuthMiddleware, getReviewById);
 router.patch('/:reviewId', jwtAuthMiddleware, requireRole('customer'), updateReview);
