@@ -18,7 +18,7 @@ const registerCustomer = async (req, res) => {
 		if (result.length === 1) {
 			return res
 				.status(400)
-				.json({ success: false, message: 'Email Already Exists. Please try another Email or User' });
+				.json({ success: false, message: 'Email already exists. please try another email or User' });
 		}
 
 		// Hash the password using bcryptjs
@@ -40,7 +40,7 @@ const registerCustomer = async (req, res) => {
 		connection.release();
 		return res
 			.status(201)
-			.json({ success: true, message: 'Customer Registered Successfully. Please verify your email.' });
+			.json({ success: true, message: 'Customer registered successfully. please verify your email.' });
 	} catch (error) {
 		await connection.rollback();
 		connection.release();
@@ -86,7 +86,7 @@ const login = async (req, res) => {
 			return res.status(403).json({ success: false, message: 'Your account is deactivated' });
 		}
 		if (!user.isVerified) {
-			return res.status(403).json({ success: false, message: 'Email is not Verified. Please verify email' });
+			return res.status(403).json({ success: false, message: 'Email is not verified. please verify email' });
 		}
 		//password verification
 		const isMatch = await bcrypt.compare(password, user.password);
@@ -111,13 +111,13 @@ const getUserDetailsById = async (req, res) => {
 		const userId = Number(req.params.id);
 		//check id is valid or not
 		if (isNaN(userId)) {
-			return res.status(400).json({ success: false, message: 'Invalid User ID' });
+			return res.status(400).json({ success: false, message: 'Invalid user id' });
 		}
 		const query = `select id, email, name, password, phone, isActive, isVerified, createdAt, updatedAt from mst_users where id = ? limit 1`;
 		const [row] = await pool.query(query, [userId]);
 		//check user find or not if not return 404
 		if (row.length === 0) {
-			return res.status(404).json({ success: false, message: 'User Not Found' });
+			return res.status(404).json({ success: false, message: 'User not found' });
 		}
 		return res.status(200).json({ success: true, message: 'Successfully get User details', user: row[0] });
 	} catch (error) {
@@ -131,7 +131,7 @@ const updateProfile = async (req, res) => {
 		const userId = Number(req.params.id);
 		//check id is valid or not
 		if (isNaN(userId)) {
-			return res.status(400).json({ success: false, message: 'Invalid User ID' });
+			return res.status(400).json({ success: false, message: 'Invalid user id' });
 		}
 		const { name, phone } = req.body;
 		// Map of fields to be updated
@@ -173,7 +173,7 @@ const deleteUser = async (req, res) => {
 		const userId = Number(req.params.id);
 		//check id is valid or not
 		if (isNaN(userId)) {
-			return res.status(400).json({ success: false, message: 'Invalid User ID' });
+			return res.status(400).json({ success: false, message: 'Invalid user id' });
 		}
 		const query = `delete from mst_users where id = ?`;
 		const [result] = await pool.query(query, [userId]);
@@ -306,7 +306,7 @@ const deactivateCustomer = async (req, res) => {
 		const userId = Number(req.params.userId);
 		//check id is valid or not
 		if (isNaN(userId)) {
-			return res.status(400).json({ success: false, message: 'Invalid User ID' });
+			return res.status(400).json({ success: false, message: 'Invalid user id' });
 		}
 		//check user exists or not
 		const idQuery = `select id, email, name, phone, isActive, isVerified, createdAt, updatedAt from mst_users where id = ? LIMIT 1`;
@@ -330,7 +330,7 @@ const activateCustomer = async (req, res) => {
 		const userId = Number(req.params.userId);
 		//check id is valid or not
 		if (isNaN(userId)) {
-			return res.status(400).json({ success: false, message: 'Invalid User ID' });
+			return res.status(400).json({ success: false, message: 'Invalid user id' });
 		}
 		//check user exists or not
 		const idQuery = `select id, email, name, phone, isActive, isVerified, createdAt, updatedAt from mst_users where id = ? LIMIT 1`;

@@ -6,7 +6,7 @@ const addReview = async (req, res) => {
 		const userId = Number(req.user.id);
 		//check id is valid or not
 		if (isNaN(userId)) {
-			return res.status(400).json({ success: false, message: 'Invalid User ID' });
+			return res.status(400).json({ success: false, message: 'Invalid user id' });
 		}
 		const { bookId, rating, comment } = req.body;
 		//check review aleady exists or not
@@ -87,7 +87,7 @@ const getReviewByBookId = async (req, res) => {
 		const bookId = Number(req.params.bookId);
 		//check id is valid or not
 		if (isNaN(bookId)) {
-			return res.status(400).json({ success: false, message: 'Invalid Book ID' });
+			return res.status(400).json({ success: false, message: 'Invalid book id' });
 		}
 		const query = `select r.id, r.rating as rating, r.comment as comment, r.createdAt as createdAt,
         b.id as bookId, b.title as bookTitle,u.id as userId, u.name as userName
@@ -110,7 +110,7 @@ const getReviewByUserIdBookId = async (req, res) => {
 		const bookId = Number(req.params.bookId);
 		//check id is valid or not
 		if (isNaN(bookId) || isNaN(userId)) {
-			return res.status(400).json({ success: false, message: 'Invalid Book or User ID' });
+			return res.status(400).json({ success: false, message: 'Invalid book or user id' });
 		}
 		const query = `select r.id, r.rating as rating, r.comment as comment, r.createdAt as createdAt,
         b.id as bookId, b.title as bookTitle,u.id as userId, u.name as userName
@@ -132,7 +132,7 @@ const getReviewById = async (req, res) => {
 		const reviewId = Number(req.params.reviewId);
 		//check id is valid or not
 		if (isNaN(reviewId)) {
-			return res.status(400).json({ success: false, message: 'Invalid Review ID' });
+			return res.status(400).json({ success: false, message: 'Invalid review id' });
 		}
 		const query = `select id, rating, comment, bookId, userId, createdAt, updatedAt from reviews where id = ? limit 1`;
 		const [result] = await pool.query(query, [reviewId]);
@@ -152,7 +152,7 @@ const updateReview = async (req, res) => {
 		const reviewId = Number(req.params.reviewId);
 		//check id is valid or not
 		if (isNaN(reviewId)) {
-			return res.status(400).json({ success: false, message: 'Invalid Review ID' });
+			return res.status(400).json({ success: false, message: 'Invalid review id' });
 		}
 		const { rating, comment } = req.body;
 		// Map of fields to be updated
@@ -194,7 +194,7 @@ const deleteReview = async (req, res) => {
 		const reviewId = Number(req.params.reviewId);
 		//check id is valid or not
 		if (isNaN(reviewId)) {
-			return res.status(400).json({ success: false, message: 'Invalid Review ID' });
+			return res.status(400).json({ success: false, message: 'Invalid review id' });
 		}
 		const query = `delete from reviews where id = ?`;
 		const [result] = await pool.query(query, [reviewId]);

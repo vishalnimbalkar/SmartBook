@@ -34,7 +34,7 @@ const getBookById = async (req, res) => {
 		const bookId = Number(req.params.bookId);
 		//check bookId is valid or not
 		if (isNaN(bookId)) {
-			return res.status(400).json({ success: false, message: 'Invalid book IDdcsd' });
+			return res.status(400).json({ success: false, message: 'Invalid book id' });
 		}
 		const query = `
             SELECT b.id, b.title, b.description, b.price, b.stock, b.coverPage, b.authorName, b.categoryId,
@@ -158,7 +158,7 @@ const updateBook = async (req, res) => {
 		const bookId = Number(req.params.bookId);
 		//check bookId is valid or not
 		if (isNaN(bookId)) {
-			return res.status(400).json({ success: false, message: 'Invalid book ID' });
+			return res.status(400).json({ success: false, message: 'Invalid book id' });
 		}
 		//check book exists or not
 		const idQuery = `select id, title, description, price, stock, coverPage, authorName, categoryId, createdAt, updatedAt from mst_books where id = ? and isActive = 1 LIMIT 1`;
@@ -213,7 +213,7 @@ const deleteBook = async (req, res) => {
 		const bookId = Number(req.params.bookId);
 		//check bookId is valid or not
 		if (isNaN(bookId)) {
-			return res.status(400).json({ success: false, message: 'Invalid book ID' });
+			return res.status(400).json({ success: false, message: 'Invalid book id' });
 		}
 
 		//check book is used for orders or not

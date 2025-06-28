@@ -87,7 +87,7 @@ const getCategoryById = async (req, res) => {
 		const categoryId = Number(req.params.categoryId);
 		//check id is valid or not
 		if (isNaN(categoryId)) {
-			return res.status(400).json({ success: false, message: 'Invalid Category ID' });
+			return res.status(400).json({ success: false, message: 'Invalid category id' });
 		}
 		const [result] = await pool.query(
 			`select id, name, description, createdAt, updatedAt from mst_categories where id = ? and isActive = 1 limit 1`,
@@ -109,7 +109,7 @@ const updateCategory = async (req, res) => {
 		const categoryId = Number(req.params.categoryId);
 		//check id is valid or not
 		if (isNaN(categoryId)) {
-			return res.status(400).json({ success: false, message: 'Invalid Category ID' });
+			return res.status(400).json({ success: false, message: 'Invalid category id' });
 		}
 		//check addess exists or not
 		const idQuery = `select id, name, description, createdAt, updatedAt from mst_categories where id = ? and isActive = 1 LIMIT 1`;
@@ -153,7 +153,7 @@ const deleteCatogory = async (req, res) => {
 		const categoryId = Number(req.params.categoryId);
 		//check id is valid or not
 		if (isNaN(categoryId)) {
-			return res.status(400).json({ success: false, message: 'Invalid category ID' });
+			return res.status(400).json({ success: false, message: 'Invalid category id' });
 		}
 		//Check if category is used for book or not
 		const [[{ cnt }]] = await pool.query(

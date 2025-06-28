@@ -7,7 +7,7 @@ const addAddress = async (req, res) => {
 		const userId = Number(req.user.id);
 		//check id is valid or not
 		if (isNaN(userId)) {
-			return res.status(400).json({ success: false, message: 'Invalid User ID' });
+			return res.status(400).json({ success: false, message: 'Invalid User id' });
 		}
 		//insert operatin
 		const query = `insert into user_addresses (userId, addressLine, city, state, zipCode, country) values (?,?,?,?,?,?)`;
@@ -25,7 +25,7 @@ const getAddressByUserId = async (req, res) => {
 		const userId = Number(req.user.id);
 		//check id is valid or not
 		if (isNaN(userId)) {
-			return res.status(400).json({ success: false, message: 'Invalid User ID' });
+			return res.status(400).json({ success: false, message: 'Invalid User id' });
 		}
 		//fetch operation
 		const query = `select id, addressLine, city, state, zipCode, country, createdAt, updatedAt from user_addresses where userId = ? and isActive = 1`;
@@ -48,7 +48,7 @@ const getAddressById = async (req, res) => {
 		const addressId = Number(req.params.addressId);
 		//check id is valid or not
 		if (isNaN(addressId)) {
-			return res.status(400).json({ success: false, message: 'Invalid Address ID' });
+			return res.status(400).json({ success: false, message: 'Invalid Address id' });
 		}
 		const [result] = await pool.query(
 			`select id, addressLine, city, state, zipCode, country, createdAt, updatedAt from user_addresses where id = ? and isActive = 1 limit 1`,
@@ -70,7 +70,7 @@ const updateAddress = async (req, res) => {
 		const addressId = Number(req.params.addressId);
 		//check id is valid or not
 		if (isNaN(addressId)) {
-			return res.status(400).json({ success: false, message: 'Invalid address ID' });
+			return res.status(400).json({ success: false, message: 'Invalid address id' });
 		}
 		//check addess exists or not
 		const idQuery = `select id, addressLine, city, state, zipCode, createdAt, updatedAt from user_addresses where id = ? and isActive = 1 LIMIT 1`;
@@ -114,7 +114,7 @@ const deleteAddress = async (req, res) => {
 		const addressId = Number(req.params.addressId);
 		//check id is valid or not
 		if (isNaN(addressId)) {
-			return res.status(400).json({ success: false, message: 'Invalid address ID' });
+			return res.status(400).json({ success: false, message: 'Invalid address id' });
 		}
 		//Check for active orders pointing at this address
 		const [[{ cnt }]] = await pool.query(

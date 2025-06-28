@@ -34,7 +34,7 @@ const getCartByUserId = async (req, res) => {
 		const userId = Number(req.user.id);
 		//check userId is valid or not
 		if (isNaN(userId)) {
-			return res.status(400).json({ success: false, message: 'Invalid user ID' });
+			return res.status(400).json({ success: false, message: 'Invalid user id' });
 		}
 		const query = `select cb.id, cb.bookId, b.title, b.price, cb.quantity, (b.price * cb.quantity) as totalPrice
              from cart_books cb
@@ -57,7 +57,7 @@ const updateQunatity = async (req, res) => {
 		const userId = Number(req.user.id);
 		const bookId = Number(req.params.bookId);
 		if (isNaN(bookId)) {
-			return res.status(400).json({ success: false, message: 'Invalid Book Id' });
+			return res.status(400).json({ success: false, message: 'Invalid book id' });
 		}
 		const { quantity } = req.body;
 		const [book] = await pool.query(`select id, stock from mst_books where id = ? limit 1`, [bookId]);
@@ -78,7 +78,7 @@ const removeBookFromCart = async (req, res) => {
 		const userId = Number(req.user.id);
 		const bookId = Number(req.params.bookId);
 		if (isNaN(userId) || isNaN(bookId)) {
-			return res.status(400).json({ success: false, message: 'Invalid user or book ID' });
+			return res.status(400).json({ success: false, message: 'Invalid user or book id' });
 		}
 		//check book is in cart or not
 		const [book] = await pool.query(`select id, bookId from cart_books where bookId = ? and userId = ?`, [
@@ -102,7 +102,7 @@ const clearCart = async (req, res) => {
 	try {
 		const userId = Number(req.user.id);
 		if (isNaN(userId)) {
-			return res.status(400).json({ success: false, message: 'Invalid User ID' });
+			return res.status(400).json({ success: false, message: 'Invalid User id' });
 		}
 		//clear operation
 		const query = `delete from cart_books where userId = ?`;

@@ -6,7 +6,7 @@ const placeOrder = async (req, res) => {
 	try {
 		const userId = Number(req.user.id);
 		if (isNaN(userId)) {
-			return res.status(400).json({ success: false, message: 'Invalid user ID' });
+			return res.status(400).json({ success: false, message: 'Invalid user id' });
 		}
 		const { addressId, orderMethod } = req.body;
 		await connection.beginTransaction();
@@ -28,7 +28,7 @@ const placeOrder = async (req, res) => {
 				await connection.rollback();
 				return res
 					.status(400)
-					.json({ success: false, message: `Not enough stock for bookId ${book.bookId}. Only ${book.stock} left.` });
+					.json({ success: false, message: `Not enough stock for bookId ${book.bookId}. only ${book.stock} left.` });
 			}
 		}
 		// 3. Calculate total amount
@@ -155,7 +155,7 @@ const cancelOrder = async (req, res) => {
 	try {
 		const orderId = Number(req.params.orderId);
 		if (isNaN(orderId)) {
-			return res.status(400).json({ success: false, message: 'Invalid user ID or order ID' });
+			return res.status(400).json({ success: false, message: 'Invalid user id or order id' });
 		}
 		await connection.beginTransaction();
 		// 1) Fetch the order and ensure it's cancellable
